@@ -56,19 +56,21 @@ export function BoldTemplate({
         </>
       )}
 
-      {/* Header Badge */}
-      <div className={`relative z-10 flex items-center justify-between shrink-0 ${hasLogoTop ? 'pt-7' : ''}`}>
-        <div 
-          className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider shadow-lg"
-          style={{
-            backgroundColor: colors.accent,
-            color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
-          }}
-        >
-          {isHook ? <Flame className="w-3.5 h-3.5 fill-current" /> : <Zap className="w-3.5 h-3.5 fill-current" />}
-          <span>{tag || (isHook ? 'ESTRATEGIA' : isCta ? 'ACCIÓN CLAVE' : `REGLA #0${index}`)}</span>
+      {/* Header Badge (Rendered ONLY if tag is not empty) */}
+      {Boolean(tag && tag.trim()) && (
+        <div className={`relative z-10 flex items-center justify-between shrink-0 ${hasLogoTop ? 'pt-7' : ''}`}>
+          <div 
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider shadow-lg"
+            style={{
+              backgroundColor: colors.accent,
+              color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+            }}
+          >
+            {isHook ? <Flame className="w-3.5 h-3.5 fill-current" /> : <Zap className="w-3.5 h-3.5 fill-current" />}
+            <span>{tag.trim()}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content Area with Dynamic Text Position */}
       <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
@@ -167,12 +169,6 @@ export function BoldTemplate({
         ) : (
           <div className="space-y-3.5">
             <div className="flex items-start gap-3">
-              <span 
-                className="text-3xl sm:text-4xl font-black leading-none shrink-0 drop-shadow-md"
-                style={{ color: colors.accent }}
-              >
-                0{index}
-              </span>
               <div className="space-y-1">
                 <h2 
                   className="text-xl sm:text-2xl font-black tracking-tight leading-tight uppercase font-sans drop-shadow-md"

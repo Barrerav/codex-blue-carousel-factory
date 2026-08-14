@@ -59,20 +59,22 @@ export function MinimalTemplate({
         </>
       )}
 
-      {/* Header Area: Tag / Step Pill */}
-      <div className={`relative z-10 flex items-center justify-between shrink-0 ${hasLogoTop ? 'pt-7' : ''}`}>
-        <div 
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all backdrop-blur-sm shadow-sm"
-          style={{
-            borderColor: `${colors.accent}60`,
-            backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.7)' : `${colors.accent}15`,
-            color: colors.accent
-          }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: colors.accent }} />
-          {tag || (isHook ? 'PORTADA' : isCta ? 'ACCIÓN' : `PASO 0${index}`)}
+      {/* Header Area: Tag / Step Pill (Rendered ONLY if tag is not empty) */}
+      {Boolean(tag && tag.trim()) && (
+        <div className={`relative z-10 flex items-center justify-between shrink-0 ${hasLogoTop ? 'pt-7' : ''}`}>
+          <div 
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all backdrop-blur-sm shadow-sm"
+            style={{
+              borderColor: `${colors.accent}60`,
+              backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.7)' : `${colors.accent}15`,
+              color: colors.accent
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: colors.accent }} />
+            <span>{tag.trim()}</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content Area with Dynamic Text Position */}
       <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
@@ -172,9 +174,6 @@ export function MinimalTemplate({
         ) : (
           <div className="space-y-3.5">
             <div className="space-y-1">
-              <span className="text-xs font-mono font-bold tracking-wider drop-shadow" style={{ color: colors.accent }}>
-                // 0{index}
-              </span>
               <h2 
                 className="text-xl sm:text-2xl font-bold tracking-tight leading-snug font-display drop-shadow-md"
                 style={{ color: colors.text }}

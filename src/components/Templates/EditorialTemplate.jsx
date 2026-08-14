@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bookmark, Quote, CornerDownRight, Sparkles } from 'lucide-react';
+import { Bookmark, Quote, CornerDownRight } from 'lucide-react';
 
 /**
  * Editorial Template - Sophisticated, Magazine & Thought Leadership
@@ -54,18 +54,20 @@ export function EditorialTemplate({
         />
       )}
 
-      {/* Header Area: Editorial Stamp */}
-      <div className={`relative z-10 flex items-center justify-between border-b pb-3 shrink-0 ${hasLogoTop ? 'pt-7' : ''}`} style={{ borderColor: `${colors.text}30` }}>
-        <div className="flex items-center gap-2">
-          <Bookmark className="w-3.5 h-3.5" style={{ color: colors.accent }} />
-          <span className="text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 drop-shadow">
-            {tag || (isHook ? 'ESSAY & FRAMEWORK' : isCta ? 'TAKEAWAY' : `CHAPTER 0${index}`)}
+      {/* Header Area: Editorial Stamp (Rendered ONLY if tag is not empty) */}
+      {Boolean(tag && tag.trim()) && (
+        <div className={`relative z-10 flex items-center justify-between border-b pb-3 shrink-0 ${hasLogoTop ? 'pt-7' : ''}`} style={{ borderColor: `${colors.text}30` }}>
+          <div className="flex items-center gap-2">
+            <Bookmark className="w-3.5 h-3.5" style={{ color: colors.accent }} />
+            <span className="text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 drop-shadow">
+              {tag.trim()}
+            </span>
+          </div>
+          <span className="text-[10px] font-mono uppercase tracking-widest opacity-70">
+            VOL. I
           </span>
         </div>
-        <span className="text-[10px] font-mono uppercase tracking-widest opacity-70">
-          VOL. I
-        </span>
-      </div>
+      )}
 
       {/* Main Content Area with Dynamic Text Position */}
       <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
@@ -106,9 +108,6 @@ export function EditorialTemplate({
         ) : isCta ? (
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <span className="text-[10px] font-mono uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
-                // CONCLUSIÓN & PRÓXIMO PASO
-              </span>
               <h2 
                 className="text-xl sm:text-2xl font-normal leading-snug font-editorial italic drop-shadow-md"
                 style={{ color: colors.text }}
@@ -157,9 +156,6 @@ export function EditorialTemplate({
         ) : (
           <div className="space-y-3.5">
             <div className="space-y-1">
-              <span className="text-xs font-mono tracking-widest opacity-70">
-                PARTE 0{index} DE 0{totalSlides}
-              </span>
               <h2 
                 className="text-xl sm:text-2xl font-normal leading-snug font-editorial italic drop-shadow-md"
                 style={{ color: colors.text }}

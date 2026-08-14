@@ -131,7 +131,7 @@ export function parseScriptToSlides(rawText) {
       // --- STRUCTURED PARSING (ChatGPT New Format) ---
       const fields = {
         type: '',
-        tag: '',
+        tag: undefined,
         title: '',
         body: '',
         highlight: '',
@@ -214,13 +214,15 @@ export function parseScriptToSlides(rawText) {
         finalType = 'cta';
       }
 
+      const resolvedTag = fields.tag !== undefined ? fields.tag : (block.tag || '');
+
       return {
         id: `slide-${index}-${Date.now().toString(36).substring(4)}`,
         index,
         totalSlides,
         type: finalType,
         rawHeader: block.rawHeader,
-        tag: fields.tag || block.tag || (finalType === 'hook' ? 'HOOK' : finalType === 'cta' ? 'CTA' : `0${index}`),
+        tag: resolvedTag,
         title: fields.title || `Slide ${index}`,
         body: fields.body || '',
         highlight: fields.highlight || '',
@@ -295,7 +297,7 @@ export function parseScriptToSlides(rawText) {
       totalSlides,
       type,
       rawHeader: block.rawHeader,
-      tag: block.tag || (type === 'hook' ? 'HOOK' : type === 'cta' ? 'CTA' : `0${index}`),
+      tag: block.tag || '',
       title: title || `Slide ${index}`,
       body: body || '',
       highlight: '',
