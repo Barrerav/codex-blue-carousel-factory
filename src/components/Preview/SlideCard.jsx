@@ -2,11 +2,12 @@ import React, { forwardRef } from 'react';
 import { MinimalTemplate } from '../Templates/MinimalTemplate';
 import { BoldTemplate } from '../Templates/BoldTemplate';
 import { EditorialTemplate } from '../Templates/EditorialTemplate';
-import { Edit3, ImagePlus } from 'lucide-react';
+import { Edit3 } from 'lucide-react';
 
 /**
  * SlideCard component with strict 4:5 aspect ratio, template rendering,
- * custom background image support, contrast overlay, watermark, slide counter, and hover controls.
+ * custom background image, contrast overlay, real logo branding, text positioning,
+ * highlight callouts, watermark, slide counter, and hover controls.
  */
 export const SlideCard = forwardRef(function SlideCard(
   {
@@ -19,26 +20,69 @@ export const SlideCard = forwardRef(function SlideCard(
   },
   ref
 ) {
-  const { template, brandColors, watermarkText, showWatermark, showSlideNumbers } = config;
+  const {
+    template,
+    brandColors,
+    watermarkText,
+    showWatermark,
+    showSlideNumbers,
+    showLogo = true,
+    logoImage = null,
+    logoPosition: globalLogoPosition = 'top-left',
+    logoSize = 36,
+    logoMargin = 24,
+  } = config;
+
   const hasCustomBg = Boolean(slide.backgroundImage);
   const overlayOpacity = slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65;
 
+  // Resolve logo position precedence: Slide override > Global config
+  const effectiveLogoPosition = (slide.logoPosition && slide.logoPosition !== 'global')
+    ? slide.logoPosition
+    : globalLogoPosition;
+
   // Select appropriate template component
   const renderTemplate = () => {
+    const templateProps = {
+      slide,
+      colors: brandColors,
+      isExport,
+      hasCustomBg,
+      textPosition: slide.textPosition || 'center',
+      highlight: slide.highlight || '',
+      logoPosition: effectiveLogoPosition,
+      hasLogoTop: Boolean(showLogo && (logoImage || showWatermark) && effectiveLogoPosition.startsWith('top')),
+    };
+
     switch (template) {
       case 'bold':
-        return <BoldTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
+        return <BoldTemplate {...templateProps} />;
       case 'editorial':
-        return <EditorialTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
+        return <EditorialTemplate {...templateProps} />;
       case 'minimal':
       default:
-        return <MinimalTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
+        return <MinimalTemplate {...templateProps} />;
+    }
+  };
+
+  // Helper to compute absolute CSS position coordinates for Logo
+  const getLogoPositionStyles = (pos, margin) => {
+    switch (pos) {
+      case 'top-right':
+        return { top: `${margin}px`, right: `${margin + 4}px` };
+      case 'bottom-left':
+        return { bottom: `${margin}px`, left: `${margin + 4}px` };
+      case 'bottom-right':
+        return { bottom: `${margin}px`, right: `${margin + 4}px` };
+      case 'top-left':
+      default:
+        return { top: `${margin}px`, left: `${margin + 4}px` };
     }
   };
 
   return (
     <div className={`relative group ${className}`}>
-      {/* 4:5 Aspect Ratio Container */}
+      {/* 4:5 Aspect Ratio Container (1080x1350 format) */}
       <div
         ref={ref}
         data-slide-index={slide.index}
@@ -56,55 +100,73 @@ export const SlideCard = forwardRef(function SlideCard(
           color: brandColors.text,
         }}
       >
-        {/* Custom Background Image Layer */}
+        {/* Layer 1: Custom Background Image Layer */}
         {hasCustomBg && (
-          <>
-            <img
-              src={slide.backgroundImage}
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
-              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-            />
-            {/* Automatic contrast scrim/overlay (dark gradient from top to bottom) */}
-            <div
-              className="absolute inset-0 z-[1] pointer-events-none"
-              style={{
-                background: `linear-gradient(180deg, rgba(7,13,26,${overlayOpacity * 0.65}) 0%, rgba(7,13,26,${overlayOpacity * 0.8}) 45%, rgba(7,13,26,${Math.min(0.98, overlayOpacity * 1.15)}) 100%)`,
-              }}
-            />
-          </>
+          <img
+            src={slide.backgroundImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+          />
         )}
 
-        {/* Template Layout Layer */}
+        {/* Layer 2: Contrast Scrim / Dark Gradient Overlay */}
+        {hasCustomBg && (
+          <div
+            className="absolute inset-0 z-[1] pointer-events-none"
+            style={{
+              background: `linear-gradient(180deg, rgba(7,13,26,${overlayOpacity * 0.65}) 0%, rgba(7,13,26,${overlayOpacity * 0.8}) 45%, rgba(7,13,26,${Math.min(0.98, overlayOpacity * 1.15)}) 100%)`,
+            }}
+          />
+        )}
+
+        {/* Layer 3 & 4: Template Visual Layout & Text Content */}
         <div className="w-full h-full flex flex-col relative z-10">
           {renderTemplate()}
         </div>
 
-        {/* Global Slide Footer: Watermark & Counter */}
-        <div className="absolute bottom-6 left-8 right-8 flex items-center justify-between pointer-events-none z-20">
-          {/* Watermark Logo */}
-          {showWatermark && (
-            <div className="flex items-center gap-1.5 opacity-80 drop-shadow-md">
-              <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: brandColors.accent }} />
-              <span 
-                className="text-xs font-mono font-bold tracking-[0.25em] uppercase"
-                style={{ color: brandColors.text }}
-              >
-                {watermarkText || 'CODEX BLUE'}
-              </span>
-            </div>
-          )}
+        {/* Layer 5: Real Logo Asset / Watermark Branding */}
+        {showLogo && (
+          <div
+            className="absolute pointer-events-none z-20 flex items-center"
+            style={getLogoPositionStyles(effectiveLogoPosition, isExport ? logoMargin * 1.2 : logoMargin)}
+          >
+            {logoImage ? (
+              <img
+                src={logoImage}
+                alt="Brand Logo"
+                className="object-contain drop-shadow-md"
+                style={{
+                  height: `${isExport ? logoSize * 1.25 : logoSize}px`,
+                  maxHeight: `${isExport ? logoSize * 1.25 : logoSize}px`,
+                  maxWidth: '140px',
+                }}
+              />
+            ) : showWatermark ? (
+              <div className="flex items-center gap-1.5 opacity-90 drop-shadow-md bg-black/20 backdrop-blur-sm px-2.5 py-1 rounded-md border border-white/10">
+                <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: brandColors.accent }} />
+                <span 
+                  className="text-[11px] font-mono font-bold tracking-[0.25em] uppercase"
+                  style={{ color: brandColors.text }}
+                >
+                  {watermarkText || 'CODEX BLUE'}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        )}
 
-          {/* Slide Counter */}
-          {showSlideNumbers && (
-            <div 
-              className="text-xs font-mono font-semibold tracking-wider opacity-80 ml-auto drop-shadow-md"
-              style={{ color: brandColors.text }}
-            >
-              {slide.index} / {slide.totalSlides}
-            </div>
-          )}
-        </div>
+        {/* Layer 6: Slide Counter / Pagination Footer */}
+        {showSlideNumbers && (
+          <div 
+            className={`absolute pointer-events-none z-20 text-xs font-mono font-semibold tracking-wider opacity-85 drop-shadow-md bg-black/25 backdrop-blur-sm px-2 py-0.5 rounded border border-white/10 ${
+              effectiveLogoPosition === 'bottom-right' ? 'bottom-6 left-8' : 'bottom-6 right-8'
+            }`}
+            style={{ color: brandColors.text }}
+          >
+            {slide.index} / {slide.totalSlides}
+          </div>
+        )}
       </div>
 
       {/* Hover Action Overlay (Disabled during export) */}
@@ -116,7 +178,7 @@ export const SlideCard = forwardRef(function SlideCard(
               onEdit(slide);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm cursor-pointer"
-            title="Editar texto e imagen de este slide"
+            title="Editar texto, prompt y fondo de este slide"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>Editar</span>

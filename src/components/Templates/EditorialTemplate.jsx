@@ -1,18 +1,43 @@
 import React from 'react';
-import { Bookmark, Quote, CornerDownRight } from 'lucide-react';
+import { Bookmark, Quote, CornerDownRight, Sparkles } from 'lucide-react';
 
 /**
  * Editorial Template - Sophisticated, Magazine & Thought Leadership
  * Elegant serif typography (Playfair Display) for headlines, refined hairline dividers.
+ * Supports textPosition, highlight callouts, and custom image backgrounds.
  */
-export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg = false }) {
+export function EditorialTemplate({
+  slide,
+  colors,
+  isExport = false,
+  hasCustomBg = false,
+  textPosition = 'center',
+  highlight = '',
+  hasLogoTop = false,
+}) {
   const { type, title, body, index, totalSlides, tag } = slide;
   const isHook = type === 'hook';
   const isCta = type === 'cta';
 
+  const getTextPositionClasses = (pos) => {
+    switch (pos) {
+      case 'top':
+        return 'mt-1 mb-auto justify-start';
+      case 'upper-center':
+        return 'mt-6 mb-auto justify-start';
+      case 'lower-center':
+        return 'mt-auto mb-6 justify-end';
+      case 'bottom':
+        return 'mt-auto mb-1 justify-end';
+      case 'center':
+      default:
+        return 'my-auto justify-center';
+    }
+  };
+
   return (
     <div 
-      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-14 relative overflow-hidden"
+      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-16 relative overflow-hidden"
       style={{
         backgroundColor: hasCustomBg ? 'transparent' : colors.primary,
         color: colors.text,
@@ -30,7 +55,7 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
       )}
 
       {/* Header Area: Editorial Stamp */}
-      <div className="relative z-10 flex items-center justify-between border-b pb-3 shrink-0" style={{ borderColor: `${colors.text}30` }}>
+      <div className={`relative z-10 flex items-center justify-between border-b pb-3 shrink-0 ${hasLogoTop ? 'pt-7' : ''}`} style={{ borderColor: `${colors.text}30` }}>
         <div className="flex items-center gap-2">
           <Bookmark className="w-3.5 h-3.5" style={{ color: colors.accent }} />
           <span className="text-[11px] font-mono uppercase tracking-[0.2em] opacity-90 drop-shadow">
@@ -42,10 +67,10 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
         </span>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative z-10 my-auto flex flex-col justify-center overflow-hidden">
+      {/* Main Content Area with Dynamic Text Position */}
+      <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
         {isHook ? (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <Quote className="w-7 h-7 opacity-50 -mb-2" style={{ color: colors.accent }} />
             
             <h1 
@@ -57,8 +82,18 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
             
             <div className="w-16 h-[1px]" style={{ backgroundColor: colors.accent }} />
 
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="pl-3 border-l-2 py-1 italic text-xs font-editorial opacity-95"
+                style={{ borderColor: colors.accent, color: colors.accent }}
+              >
+                « {highlight} »
+              </div>
+            )}
+
             {body && (
-              <p className="text-sm font-sans font-light leading-relaxed opacity-90 drop-shadow">
+              <p className="text-sm font-sans font-light leading-relaxed opacity-90 drop-shadow whitespace-pre-line">
                 {body}
               </p>
             )}
@@ -81,6 +116,20 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
                 {title}
               </h2>
             </div>
+
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="p-3 rounded-lg border-l-2 text-xs font-editorial italic"
+                style={{
+                  borderColor: colors.accent,
+                  backgroundColor: `${colors.accent}15`,
+                  color: colors.text
+                }}
+              >
+                {highlight}
+              </div>
+            )}
 
             {body && (
               <div 
@@ -106,7 +155,7 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             <div className="space-y-1">
               <span className="text-xs font-mono tracking-widest opacity-70">
                 PARTE 0{index} DE 0{totalSlides}
@@ -120,6 +169,16 @@ export function EditorialTemplate({ slide, colors, isExport = false, hasCustomBg
             </div>
 
             <div className="w-12 h-[1px]" style={{ backgroundColor: `${colors.accent}80` }} />
+
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="pl-3 border-l-2 py-0.5 italic text-xs font-editorial"
+                style={{ borderColor: colors.accent, color: colors.accent }}
+              >
+                {highlight}
+              </div>
+            )}
 
             <div className="space-y-2">
               <p 

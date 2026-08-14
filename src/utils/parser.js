@@ -1,11 +1,44 @@
 /**
+ * Normalize Text Position string to one of the valid positions
+ * @param {string} val 
+ * @returns {'top' | 'upper-center' | 'center' | 'lower-center' | 'bottom'}
+ */
+function normalizeTextPosition(val) {
+  if (!val) return 'center';
+  const clean = val.trim().toLowerCase().replace(/[_ ]+/g, '-');
+  if (['top', 'upper-center', 'center', 'lower-center', 'bottom'].includes(clean)) {
+    return /** @type {any} */ (clean);
+  }
+  if (clean === 'upper' || clean === 'top-center') return 'upper-center';
+  if (clean === 'lower' || clean === 'bottom-center') return 'lower-center';
+  return 'center';
+}
+
+/**
+ * Normalize Logo Position string
+ * @param {string} val 
+ * @returns {'global' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'}
+ */
+function normalizeLogoPosition(val) {
+  if (!val) return 'global';
+  const clean = val.trim().toLowerCase().replace(/[_ ]+/g, '-');
+  if (['global', 'top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(clean)) {
+    return /** @type {any} */ (clean);
+  }
+  if (clean === 'topleft') return 'top-left';
+  if (clean === 'topright') return 'top-right';
+  if (clean === 'bottomleft') return 'bottom-left';
+  if (clean === 'bottomright') return 'bottom-right';
+  return 'global';
+}
+
+/**
  * Parse raw carousel script into an array of structured Slide objects.
  * 
  * Supports:
- * - SLIDE 1 (HOOK): [hook text]
- * - SLIDE N: [title] | [body]
- * - SLIDE FINAL (CTA): [cta text]
- * - Varied block formats, custom numbers, missing pipes, etc.
+ * - Structured ChatGPT Format (TYPE, TITLE, BODY, HIGHLIGHT, VISUAL, PROMPT, TEXT_POSITION, LOGO_POSITION)
+ * - Legacy Pipe Format: SLIDE 1 (HOOK): [hook text] | SLIDE N: [title] | [body]
+ * - Plain Multiline and paragraph variations
  * 
  * @param {string} rawText
  * @returns {import('../types/carousel').Slide[]}
@@ -20,9 +53,6 @@ export function parseScriptToSlides(rawText) {
     return [];
   }
 
-  // Regex to split by slide boundary markers (e.g. SLIDE 1, SLIDE 2 (HOOK), SLIDE FINAL, DIAPOSITIVA X)
-  const slideHeaderRegex = /(?:^|\n+)(?:(?:SLIDE|DIAPOSITIVA|TARJETA)\s*(?:\d+|FINAL)?(?:\s*\([^)]+\))?|HOOK|CTA)\s*[:：\-–—]?\s*/i;
-
   // Split into raw blocks while capturing headers
   const lines = cleanText.split('\n');
   const slideBlocks = [];
@@ -31,14 +61,6 @@ export function parseScriptToSlides(rawText) {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmedLine = line.trim();
-
-    if (!trimmedLine) {
-      if (currentBlock && currentBlock.lines.length > 0) {
-        // Keep empty line inside a block if already has content
-        currentBlock.lines.push('');
-      }
-      continue;
-    }
 
     // Check if this line is a new slide header
     const match = trimmedLine.match(/^(?:(?:SLIDE|DIAPOSITIVA|TARJETA)\s*(\d+|FINAL)?(?:\s*\(([^)]+)\))?|(HOOK|CTA))\s*[:：\-–—]?\s*(.*)$/i);
@@ -68,10 +90,10 @@ export function parseScriptToSlides(rawText) {
           slideNum: '1',
           tag: 'HOOK',
           inlineContent: '',
-          lines: [trimmedLine]
+          lines: [line]
         };
       } else {
-        currentBlock.lines.push(trimmedLine);
+        currentBlock.lines.push(line);
       }
     }
   }
@@ -101,7 +123,117 @@ export function parseScriptToSlides(rawText) {
     const isFirst = idx === 0;
     const isLast = idx === totalSlides - 1;
 
-    // Determine slide role/type
+    // Check if this block contains structured key-value lines
+    const structuredKeyRegex = /^(TYPE|TAG|TITLE|BODY|HIGHLIGHT|VISUAL|PROMPT|TEXT_POSITION|TEXT POSITION|LOGO_POSITION|LOGO POSITION)\s*[:：]\s*(.*)$/i;
+    const hasStructuredKeys = block.lines.some(l => structuredKeyRegex.test(l.trim()));
+
+    if (hasStructuredKeys) {
+      // --- STRUCTURED PARSING (ChatGPT New Format) ---
+      const fields = {
+        type: '',
+        tag: '',
+        title: '',
+        body: '',
+        highlight: '',
+        visualConcept: '',
+        visualPrompt: '',
+        textPosition: 'center',
+        logoPosition: 'global'
+      };
+
+      let currentField = null;
+
+      for (let j = 0; j < block.lines.length; j++) {
+        const rawLine = block.lines[j];
+        const lineTrimmed = rawLine.trim();
+
+        const fieldMatch = lineTrimmed.match(structuredKeyRegex);
+        if (fieldMatch) {
+          const rawKey = fieldMatch[1].toUpperCase().replace(/\s+/g, '_');
+          const value = fieldMatch[2];
+
+          switch (rawKey) {
+            case 'TYPE':
+              currentField = 'type';
+              fields.type = value.trim().toLowerCase();
+              break;
+            case 'TAG':
+              currentField = 'tag';
+              fields.tag = value.trim();
+              break;
+            case 'TITLE':
+              currentField = 'title';
+              fields.title = value.trim();
+              break;
+            case 'BODY':
+              currentField = 'body';
+              fields.body = value.trim();
+              break;
+            case 'HIGHLIGHT':
+              currentField = 'highlight';
+              fields.highlight = value.trim();
+              break;
+            case 'VISUAL':
+              currentField = 'visualConcept';
+              fields.visualConcept = value.trim();
+              break;
+            case 'PROMPT':
+              currentField = 'visualPrompt';
+              fields.visualPrompt = value.trim();
+              break;
+            case 'TEXT_POSITION':
+              currentField = 'textPosition';
+              fields.textPosition = normalizeTextPosition(value);
+              break;
+            case 'LOGO_POSITION':
+              currentField = 'logoPosition';
+              fields.logoPosition = normalizeLogoPosition(value);
+              break;
+            default:
+              currentField = null;
+              break;
+          }
+        } else {
+          // Continuation line for multi-line fields (e.g. PROMPT or BODY)
+          if (currentField && ['visualPrompt', 'body', 'visualConcept', 'title', 'highlight'].includes(currentField)) {
+            if (fields[currentField]) {
+              fields[currentField] += '\n' + rawLine;
+            } else if (lineTrimmed) {
+              fields[currentField] = rawLine;
+            }
+          }
+        }
+      }
+
+      // Determine slide role/type
+      let finalType = 'content';
+      const parsedType = (fields.type || '').toLowerCase();
+      if (parsedType === 'hook' || parsedType === 'portada' || (isFirst && totalSlides > 1 && !parsedType)) {
+        finalType = 'hook';
+      } else if (parsedType === 'cta' || parsedType === 'final' || (isLast && totalSlides > 2 && !parsedType)) {
+        finalType = 'cta';
+      }
+
+      return {
+        id: `slide-${index}-${Date.now().toString(36).substring(4)}`,
+        index,
+        totalSlides,
+        type: finalType,
+        rawHeader: block.rawHeader,
+        tag: fields.tag || block.tag || (finalType === 'hook' ? 'HOOK' : finalType === 'cta' ? 'CTA' : `0${index}`),
+        title: fields.title || `Slide ${index}`,
+        body: fields.body || '',
+        highlight: fields.highlight || '',
+        visualConcept: fields.visualConcept || '',
+        visualPrompt: fields.visualPrompt || '',
+        textPosition: normalizeTextPosition(fields.textPosition),
+        logoPosition: normalizeLogoPosition(fields.logoPosition),
+        backgroundImage: null,
+        overlayOpacity: 0.65,
+      };
+    }
+
+    // --- LEGACY PARSING (Pipe & Simple Multiline Format) ---
     let type = 'content';
     const tagUpper = (block.tag || '').toUpperCase();
     const headerUpper = (block.rawHeader || '').toUpperCase();
@@ -137,17 +269,14 @@ export function parseScriptToSlides(rawText) {
       body = parts.slice(1).join('|').trim();
     } else {
       if (type === 'hook' || type === 'cta') {
-        // Hooks and CTAs are predominantly title/statement driven
         title = fullText;
         body = '';
       } else {
-        // For standard content without pipe, split on first line break or punctuation
         const linesArr = block.lines.filter(l => l.trim());
         if (linesArr.length > 1) {
           title = linesArr[0].trim();
           body = linesArr.slice(1).join('\n').trim();
         } else {
-          // If single line without pipe, check for colon or bullet
           const colonIdx = fullText.indexOf(':');
           if (colonIdx > 0 && colonIdx < 60) {
             title = fullText.substring(0, colonIdx).trim();
@@ -169,6 +298,13 @@ export function parseScriptToSlides(rawText) {
       tag: block.tag || (type === 'hook' ? 'HOOK' : type === 'cta' ? 'CTA' : `0${index}`),
       title: title || `Slide ${index}`,
       body: body || '',
+      highlight: '',
+      visualConcept: '',
+      visualPrompt: '',
+      textPosition: 'center',
+      logoPosition: 'global',
+      backgroundImage: null,
+      overlayOpacity: 0.65,
     };
   });
 }

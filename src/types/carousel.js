@@ -1,5 +1,8 @@
 /**
  * @typedef {'hook' | 'content' | 'cta'} SlideType
+ * @typedef {'top' | 'upper-center' | 'center' | 'lower-center' | 'bottom'} TextPosition
+ * @typedef {'global' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'} SlideLogoPosition
+ * @typedef {'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'} GlobalLogoPosition
  * 
  * @typedef {Object} Slide
  * @property {string} id
@@ -8,9 +11,14 @@
  * @property {SlideType} type
  * @property {string} title
  * @property {string} body
+ * @property {string} [highlight] - Punchline / Highlight callout
+ * @property {string} [visualConcept] - Short description of visual background concept
+ * @property {string} [visualPrompt] - Full prompt for Gemini image generation
+ * @property {TextPosition} [textPosition] - Vertical alignment for main content
+ * @property {SlideLogoPosition} [logoPosition] - Position of logo on this slide
  * @property {string} [rawHeader]
  * @property {string} [tag]
- * @property {string} [backgroundImage] - Base64 Data URL or image URL for custom background
+ * @property {string | null} [backgroundImage] - Base64 Data URL or image URL for custom background
  * @property {number} [overlayOpacity] - Dark contrast overlay opacity (0 to 1, default: 0.65)
  * 
  * @typedef {Object} BrandColors
@@ -27,6 +35,11 @@
  * @property {boolean} showWatermark
  * @property {boolean} showSlideNumbers
  * @property {'4:5'} aspectRatio
+ * @property {boolean} showLogo
+ * @property {string | null} logoImage
+ * @property {GlobalLogoPosition} logoPosition
+ * @property {number} logoSize
+ * @property {number} logoMargin
  */
 
 export const DEFAULT_BRAND_COLORS = {

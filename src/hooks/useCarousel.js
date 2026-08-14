@@ -14,6 +14,12 @@ export function useCarousel() {
     showWatermark: true,
     showSlideNumbers: true,
     aspectRatio: '4:5',
+    // Real Logo Asset Configuration
+    showLogo: true,
+    logoImage: null,
+    logoPosition: 'top-left', // 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    logoSize: 36, // px height bound
+    logoMargin: 28, // px margin from edges
   });
 
   const [viewMode, setViewMode] = useState('carousel'); // 'carousel' | 'feed-grid'
@@ -26,7 +32,7 @@ export function useCarousel() {
   const slideRefs = useRef([]);
   const exportContainerRef = useRef(null);
 
-  // Automatically re-parse when raw script changes while preserving uploaded images & overlays
+  // Automatically re-parse when raw script changes while preserving uploaded images & custom properties
   useEffect(() => {
     const parsed = parseScriptToSlides(script);
     setSlides((prevSlides) => {
@@ -37,6 +43,11 @@ export function useCarousel() {
             ...newSlide,
             backgroundImage: existing.backgroundImage || null,
             overlayOpacity: existing.overlayOpacity !== undefined ? existing.overlayOpacity : 0.65,
+            highlight: newSlide.highlight || existing.highlight || '',
+            visualConcept: newSlide.visualConcept || existing.visualConcept || '',
+            visualPrompt: newSlide.visualPrompt || existing.visualPrompt || '',
+            textPosition: newSlide.textPosition || existing.textPosition || 'center',
+            logoPosition: newSlide.logoPosition || existing.logoPosition || 'global',
           };
         }
         return newSlide;

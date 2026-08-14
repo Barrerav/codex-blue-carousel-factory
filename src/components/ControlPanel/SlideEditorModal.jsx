@@ -1,27 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Check, Edit3, Trash2, Tag, ImagePlus, Sliders, Image as ImageIcon } from 'lucide-react';
+import {
+  X,
+  Check,
+  Edit3,
+  Trash2,
+  Tag,
+  ImagePlus,
+  Sliders,
+  Image as ImageIcon,
+  Sparkles,
+  Copy,
+  Layout,
+  Compass,
+  Zap,
+} from 'lucide-react';
 
 export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
   if (!isOpen || !slide) return null;
 
   const [title, setTitle] = useState(slide.title || '');
   const [body, setBody] = useState(slide.body || '');
+  const [highlight, setHighlight] = useState(slide.highlight || '');
   const [tag, setTag] = useState(slide.tag || '');
   const [type, setType] = useState(slide.type || 'content');
+  const [visualConcept, setVisualConcept] = useState(slide.visualConcept || '');
+  const [visualPrompt, setVisualPrompt] = useState(slide.visualPrompt || '');
+  const [textPosition, setTextPosition] = useState(slide.textPosition || 'center');
+  const [logoPosition, setLogoPosition] = useState(slide.logoPosition || 'global');
   const [backgroundImage, setBackgroundImage] = useState(slide.backgroundImage || null);
   const [overlayOpacity, setOverlayOpacity] = useState(
     slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65
   );
 
+  const [copiedPrompt, setCopiedPrompt] = useState(false);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     setTitle(slide.title || '');
     setBody(slide.body || '');
+    setHighlight(slide.highlight || '');
     setTag(slide.tag || '');
     setType(slide.type || 'content');
+    setVisualConcept(slide.visualConcept || '');
+    setVisualPrompt(slide.visualPrompt || '');
+    setTextPosition(slide.textPosition || 'center');
+    setLogoPosition(slide.logoPosition || 'global');
     setBackgroundImage(slide.backgroundImage || null);
     setOverlayOpacity(slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65);
+    setCopiedPrompt(false);
   }, [slide]);
 
   const handleImageFile = (e) => {
@@ -44,14 +70,26 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
     e.target.value = '';
   };
 
+  const handleCopyPrompt = () => {
+    if (!visualPrompt) return;
+    navigator.clipboard.writeText(visualPrompt);
+    setCopiedPrompt(true);
+    setTimeout(() => setCopiedPrompt(false), 2000);
+  };
+
   const handleSave = (e) => {
     e.preventDefault();
     onSave({
       ...slide,
       title: title.trim(),
       body: body.trim(),
+      highlight: highlight.trim(),
       tag: tag.trim(),
       type,
+      visualConcept: visualConcept.trim(),
+      visualPrompt: visualPrompt.trim(),
+      textPosition,
+      logoPosition,
       backgroundImage,
       overlayOpacity,
     });
@@ -61,7 +99,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
       <div 
-        className="w-full max-w-lg bg-[#0d1629] border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden animate-scaleUp max-h-[90vh] flex flex-col"
+        className="w-full max-w-2xl bg-[#0d1629] border border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden animate-scaleUp max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -75,7 +113,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                 Editar Slide #{slide.index} de {slide.totalSlides}
               </h3>
               <p className="text-xs text-slate-400">
-                Modifica el contenido e imagen de fondo individual.
+                Ajusta contenido, dirección visual, prompt Gemini y fondo.
               </p>
             </div>
           </div>
@@ -88,44 +126,201 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSave} className="p-6 space-y-4 overflow-y-auto flex-1">
-          {/* Slide Type Selection */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300">Rol del Slide</label>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { id: 'hook', label: 'Hook (Portada)' },
-                { id: 'content', label: 'Contenido' },
-                { id: 'cta', label: 'CTA (Cierre)' },
-              ].map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setType(t.id)}
-                  className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all ${
-                    type === t.id
-                      ? 'bg-blue-600 border-blue-500 text-white shadow-sm'
-                      : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
+        <form onSubmit={handleSave} className="p-6 space-y-6 overflow-y-auto flex-1">
+          {/* SECTION 1: CONTENT DATA */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-1 border-b border-slate-800">
+              <Tag className="w-4 h-4 text-blue-400" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                Contenido del Slide
+              </h4>
+            </div>
+
+            {/* Slide Type Selection */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-slate-300">Rol del Slide</label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { id: 'hook', label: 'Hook (Portada)' },
+                  { id: 'content', label: 'Contenido' },
+                  { id: 'cta', label: 'CTA (Cierre)' },
+                ].map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setType(t.id)}
+                    className={`py-2 px-3 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      type === t.id
+                        ? 'bg-blue-600 border-blue-500 text-white shadow-sm'
+                        : 'bg-slate-900/50 border-slate-800 text-slate-300 hover:border-slate-700'
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tag / Pill Label & Title */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="space-y-1 sm:col-span-1">
+                <label className="text-xs font-semibold text-slate-300">Etiqueta Superior</label>
+                <input
+                  type="text"
+                  value={tag}
+                  onChange={(e) => setTag(e.target.value)}
+                  placeholder="Ej: HOOK, 01, CTA"
+                  className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="space-y-1 sm:col-span-2">
+                <label className="text-xs font-semibold text-slate-300">Título / Frase Principal</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Título llamativo..."
+                  className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Highlight Callout */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-amber-400" />
+                <span>Highlight / Frase Destacada (Opcional)</span>
+              </label>
+              <input
+                type="text"
+                value={highlight}
+                onChange={(e) => setHighlight(e.target.value)}
+                placeholder="Ej: 10x más rápido que versiones anteriores..."
+                className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
+            </div>
+
+            {/* Body Text */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">
+                Cuerpo / Explicación {type === 'hook' && '(Opcional en Portada)'}
+              </label>
+              <textarea
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder="Cuerpo del mensaje, puntos clave o llamado a la acción..."
+                rows={3}
+                className="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none leading-relaxed"
+              />
             </div>
           </div>
 
-          {/* Custom Background Image Uploader */}
-          <div className="space-y-2 p-3.5 rounded-xl bg-slate-950/70 border border-slate-800">
+          {/* SECTION 2: DIRECCIÓN VISUAL */}
+          <div className="space-y-4 p-4 rounded-xl bg-slate-950/60 border border-purple-500/30">
+            <div className="flex items-center justify-between pb-1 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Compass className="w-4 h-4 text-purple-400" />
+                <h4 className="text-xs font-bold uppercase tracking-wider text-purple-300">
+                  Dirección Visual & Prompt Gemini
+                </h4>
+              </div>
+
+              {visualPrompt && (
+                <button
+                  type="button"
+                  onClick={handleCopyPrompt}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                    copiedPrompt
+                      ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-300'
+                      : 'bg-purple-600/20 border-purple-500/40 text-purple-300 hover:bg-purple-600/30 hover:text-white'
+                  }`}
+                >
+                  {copiedPrompt ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                  <span>{copiedPrompt ? 'Prompt copiado' : 'Copiar Prompt Gemini'}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Visual Concept */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Concepto Visual (VISUAL)</label>
+              <input
+                type="text"
+                value={visualConcept}
+                onChange={(e) => setVisualConcept(e.target.value)}
+                placeholder="Ej: Futuristic AI core with cyan laser lighting..."
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Prompt Gemini */}
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-300">Prompt Gemini Completo (PROMPT)</label>
+              <textarea
+                value={visualPrompt}
+                onChange={(e) => setVisualPrompt(e.target.value)}
+                placeholder="Pega el prompt detallado para generar el fondo en Gemini..."
+                rows={4}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 resize-none font-mono text-[11px] leading-relaxed"
+              />
+            </div>
+
+            {/* Layout Positioning: Text Position & Logo Position */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {/* Text Position */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  <Layout className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Posición del Texto</span>
+                </label>
+                <select
+                  value={textPosition}
+                  onChange={(e) => setTextPosition(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="top">Arriba (Top)</option>
+                  <option value="upper-center">Centro Superior (Upper-Center)</option>
+                  <option value="center">Centro (Center - Por Defecto)</option>
+                  <option value="lower-center">Centro Inferior (Lower-Center)</option>
+                  <option value="bottom">Abajo (Bottom)</option>
+                </select>
+              </div>
+
+              {/* Logo Position */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Posición del Logo en Slide</span>
+                </label>
+                <select
+                  value={logoPosition}
+                  onChange={(e) => setLogoPosition(e.target.value)}
+                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                >
+                  <option value="global">Usar Global (Por Defecto)</option>
+                  <option value="top-left">Superior Izquierda (Top-Left)</option>
+                  <option value="top-right">Superior Derecha (Top-Right)</option>
+                  <option value="bottom-left">Inferior Izquierda (Bottom-Left)</option>
+                  <option value="bottom-right">Inferior Derecha (Bottom-Right)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* SECTION 3: CUSTOM BACKGROUND IMAGE */}
+          <div className="space-y-3 p-4 rounded-xl bg-slate-950/70 border border-slate-800">
             <div className="flex items-center justify-between">
               <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
                 <ImageIcon className="w-3.5 h-3.5 text-blue-400" />
-                <span>Imagen de Fondo Personalizada</span>
+                <span>Fondo del Slide</span>
               </label>
               {backgroundImage && (
                 <button
                   type="button"
                   onClick={() => setBackgroundImage(null)}
-                  className="text-[11px] text-red-400 hover:text-red-300 font-medium flex items-center gap-1"
+                  className="text-[11px] text-red-400 hover:text-red-300 font-medium flex items-center gap-1 cursor-pointer"
                 >
                   <Trash2 className="w-3 h-3" />
                   <span>Quitar Imagen</span>
@@ -144,7 +339,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
             {backgroundImage ? (
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-14 h-16 rounded-lg border border-blue-500/50 overflow-hidden shrink-0 shadow-sm">
+                  <div className="w-14 h-16 rounded-lg border border-emerald-500/50 overflow-hidden shrink-0 shadow-sm">
                     <img
                       src={backgroundImage}
                       alt=""
@@ -152,13 +347,13 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                     />
                   </div>
                   <div className="flex-1 space-y-1">
-                    <p className="text-xs font-medium text-emerald-400 flex items-center gap-1">
-                      <span>✓ Imagen cargada con éxito</span>
+                    <p className="text-xs font-medium text-emerald-400">
+                      ✓ Fondo cargado (FONDO LISTO)
                     </p>
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                      className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-colors cursor-pointer"
                     >
                       Reemplazar Imagen
                     </button>
@@ -169,7 +364,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                 <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-3 text-xs">
                   <span className="text-slate-400 flex items-center gap-1 text-[11px]">
                     <Sliders className="w-3 h-3 text-blue-400" />
-                    <span>Oscurecimiento:</span>
+                    <span>Oscurecimiento / Contraste:</span>
                   </span>
                   <div className="flex items-center gap-2 flex-1 max-w-[200px]">
                     <input
@@ -193,51 +388,9 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                 className="w-full py-3 px-4 rounded-xl border border-dashed border-slate-700 hover:border-blue-500 bg-slate-900/40 hover:bg-blue-500/10 text-slate-300 hover:text-blue-400 transition-all flex items-center justify-center gap-2 text-xs font-semibold cursor-pointer"
               >
                 <ImagePlus className="w-4 h-4 text-blue-400" />
-                <span>Subir imagen desde mi computadora (PNG/JPG)</span>
+                <span>Subir imagen de fondo generada en Gemini (PNG/JPG)</span>
               </button>
             )}
-          </div>
-
-          {/* Tag / Pill Label */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-              <Tag className="w-3.5 h-3.5 text-blue-400" />
-              <span>Etiqueta / Tag Superior</span>
-            </label>
-            <input
-              type="text"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              placeholder="Ej: TIP 01, ESTRATEGIA, HOOK, ACCIÓN"
-              className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Title / Main Statement */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300">Título o Frase Principal</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Escribe el título llamativo del slide..."
-              className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3.5 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 font-semibold"
-              required
-            />
-          </div>
-
-          {/* Body Text */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-300">
-              Cuerpo / Explicación {type === 'hook' && '(Opcional en Portada)'}
-            </label>
-            <textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              placeholder="Escribe el cuerpo del mensaje, puntos clave o llamado a la acción..."
-              rows={4}
-              className="w-full bg-slate-950/70 border border-slate-800 rounded-xl p-3.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none leading-relaxed"
-            />
           </div>
 
           {/* Action Buttons */}

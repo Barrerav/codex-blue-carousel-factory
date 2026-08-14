@@ -3,16 +3,40 @@ import { Flame, ArrowUpRight, Zap } from 'lucide-react';
 
 /**
  * Bold / Alto Contraste Template - High Impact & Authority
- * Heavy display font, solid accent badges, punchy visual blocks.
+ * Supports textPosition, highlight callouts, and custom image backgrounds.
  */
-export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = false }) {
+export function BoldTemplate({
+  slide,
+  colors,
+  isExport = false,
+  hasCustomBg = false,
+  textPosition = 'center',
+  highlight = '',
+  hasLogoTop = false,
+}) {
   const { type, title, body, index, totalSlides, tag } = slide;
   const isHook = type === 'hook';
   const isCta = type === 'cta';
 
+  const getTextPositionClasses = (pos) => {
+    switch (pos) {
+      case 'top':
+        return 'mt-1 mb-auto justify-start';
+      case 'upper-center':
+        return 'mt-6 mb-auto justify-start';
+      case 'lower-center':
+        return 'mt-auto mb-6 justify-end';
+      case 'bottom':
+        return 'mt-auto mb-1 justify-end';
+      case 'center':
+      default:
+        return 'my-auto justify-center';
+    }
+  };
+
   return (
     <div 
-      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-14 relative overflow-hidden"
+      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-16 relative overflow-hidden"
       style={{
         backgroundColor: hasCustomBg ? 'transparent' : colors.primary,
         color: colors.text,
@@ -33,7 +57,7 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
       )}
 
       {/* Header Badge */}
-      <div className="relative z-10 flex items-center justify-between shrink-0">
+      <div className={`relative z-10 flex items-center justify-between shrink-0 ${hasLogoTop ? 'pt-7' : ''}`}>
         <div 
           className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider shadow-lg"
           style={{
@@ -46,16 +70,30 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="relative z-10 my-auto flex flex-col justify-center overflow-hidden">
+      {/* Main Content Area with Dynamic Text Position */}
+      <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
         {isHook ? (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <h1 
               className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.1] font-sans drop-shadow-lg"
               style={{ color: colors.text }}
             >
               {title}
             </h1>
+
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg"
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+                }}
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>{highlight}</span>
+              </div>
+            )}
             
             {body && (
               <div 
@@ -66,7 +104,7 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
                   color: colors.text
                 }}
               >
-                <p className="text-sm sm:text-base font-semibold opacity-95">
+                <p className="text-sm sm:text-base font-semibold opacity-95 whitespace-pre-line">
                   {body}
                 </p>
               </div>
@@ -99,6 +137,19 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
               {title}
             </h2>
 
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-md"
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+                }}
+              >
+                <span>⚡ {highlight}</span>
+              </div>
+            )}
+
             {body && (
               <div 
                 className="p-4 rounded-2xl border-l-4 backdrop-blur-md shadow-lg"
@@ -114,7 +165,7 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
             )}
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             <div className="flex items-start gap-3">
               <span 
                 className="text-3xl sm:text-4xl font-black leading-none shrink-0 drop-shadow-md"
@@ -131,6 +182,21 @@ export function BoldTemplate({ slide, colors, isExport = false, hasCustomBg = fa
                 </h2>
               </div>
             </div>
+
+            {/* Optional Highlight Callout */}
+            {highlight && (
+              <div 
+                className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide flex items-center gap-1.5 shadow-md"
+                style={{
+                  backgroundColor: `${colors.accent}30`,
+                  borderLeft: `3px solid ${colors.accent}`,
+                  color: colors.text
+                }}
+              >
+                <Zap className="w-3 h-3 text-blue-400 fill-current" />
+                <span>{highlight}</span>
+              </div>
+            )}
 
             <div 
               className="p-4 rounded-2xl border backdrop-blur-md shadow-lg"
