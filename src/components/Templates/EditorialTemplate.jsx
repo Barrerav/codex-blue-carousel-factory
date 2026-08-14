@@ -12,7 +12,7 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
 
   return (
     <div 
-      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 relative overflow-hidden"
+      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-14 relative overflow-hidden"
       style={{
         backgroundColor: colors.primary,
         color: colors.text,
@@ -28,7 +28,7 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
       />
 
       {/* Header Area: Editorial Stamp */}
-      <div className="relative z-10 flex items-center justify-between border-b pb-3" style={{ borderColor: `${colors.text}20` }}>
+      <div className="relative z-10 flex items-center justify-between border-b pb-3 shrink-0" style={{ borderColor: `${colors.text}20` }}>
         <div className="flex items-center gap-2">
           <Bookmark className="w-3.5 h-3.5" style={{ color: colors.accent }} />
           <span className="text-[11px] font-mono uppercase tracking-[0.2em] opacity-80">
@@ -41,10 +41,10 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 my-auto flex flex-col justify-center">
+      <div className="relative z-10 my-auto flex flex-col justify-center overflow-hidden">
         {isHook ? (
-          <div className="space-y-6">
-            <Quote className="w-8 h-8 opacity-40 -mb-2" style={{ color: colors.accent }} />
+          <div className="space-y-5">
+            <Quote className="w-7 h-7 opacity-40 -mb-2" style={{ color: colors.accent }} />
             
             <h1 
               className="text-2xl sm:text-3xl font-normal leading-[1.3] font-editorial italic"
@@ -61,48 +61,50 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
               </p>
             )}
 
-            <div className="pt-2 flex items-center gap-2 text-xs font-mono tracking-wider opacity-70">
+            <div className="pt-1 flex items-center gap-2 text-xs font-mono tracking-wider opacity-70">
               <CornerDownRight className="w-3.5 h-3.5" style={{ color: colors.accent }} />
               <span>Desliza para continuar leyendo</span>
             </div>
           </div>
         ) : isCta ? (
-          <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <span className="text-xs font-mono uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-mono uppercase tracking-[0.25em]" style={{ color: colors.accent }}>
                 // CONCLUSIÓN & PRÓXIMO PASO
               </span>
               <h2 
-                className="text-2xl sm:text-3xl font-normal leading-snug font-editorial italic"
+                className="text-xl sm:text-2xl font-normal leading-snug font-editorial italic"
                 style={{ color: colors.text }}
               >
                 {title}
               </h2>
             </div>
 
-            <div 
-              className="p-6 rounded-lg border-l-2 relative"
-              style={{
-                borderColor: colors.accent,
-                backgroundColor: `${colors.primary === '#070d1a' ? '#0d1527' : colors.primary}80`
-              }}
-            >
-              <p className="text-sm sm:text-base font-light leading-relaxed opacity-90 font-sans">
-                {body}
-              </p>
-            </div>
+            {body && (
+              <div 
+                className="p-4 rounded-lg border-l-2 relative"
+                style={{
+                  borderColor: colors.accent,
+                  backgroundColor: `${colors.primary === '#070d1a' ? '#0d1527' : colors.primary}80`
+                }}
+              >
+                <p className="text-xs sm:text-sm font-light leading-relaxed opacity-90 font-sans whitespace-pre-line">
+                  {body}
+                </p>
+              </div>
+            )}
 
-            <div className="pt-2 flex items-center justify-between border-t pt-4" style={{ borderColor: `${colors.text}20` }}>
-              <span className="text-xs font-mono tracking-wider opacity-80">
+            <div className="pt-2 flex items-center justify-between border-t pt-3" style={{ borderColor: `${colors.text}20` }}>
+              <span className="text-[10px] font-mono tracking-wider opacity-70">
                 CODEX BLUE STUDIO
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: colors.accent }}>
+              <span className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: colors.accent }}>
                 @codexblue
               </span>
             </div>
           </div>
         ) : (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div className="space-y-1">
               <span className="text-xs font-mono tracking-widest opacity-60">
                 PARTE 0{index} DE 0{totalSlides}
@@ -117,9 +119,9 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
 
             <div className="w-12 h-[1px]" style={{ backgroundColor: `${colors.accent}80` }} />
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <p 
-                className="text-sm sm:text-base font-light leading-relaxed opacity-90 font-sans whitespace-pre-line"
+                className="text-xs sm:text-sm font-light leading-relaxed opacity-90 font-sans whitespace-pre-line"
                 style={{ color: colors.text }}
               >
                 {body}
@@ -129,7 +131,7 @@ export function EditorialTemplate({ slide, colors, isExport = false }) {
         )}
       </div>
 
-      <div className="h-6" />
+      <div className="h-2 shrink-0" />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 /**
  * Minimal Template - Technical, Clean Swiss Design
@@ -12,7 +12,7 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
 
   return (
     <div 
-      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 relative overflow-hidden"
+      className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-14 relative overflow-hidden"
       style={{
         backgroundColor: colors.primary,
         color: colors.text,
@@ -32,7 +32,7 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
       />
 
       {/* Header Area: Tag / Step Pill */}
-      <div className="relative z-10 flex items-center justify-between">
+      <div className="relative z-10 flex items-center justify-between shrink-0">
         <div 
           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all"
           style={{
@@ -47,9 +47,9 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
       </div>
 
       {/* Main Content Area */}
-      <div className="relative z-10 my-auto flex flex-col justify-center">
+      <div className="relative z-10 my-auto flex flex-col justify-center overflow-hidden">
         {isHook ? (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div 
               className="w-12 h-1 rounded-full"
               style={{ backgroundColor: colors.accent }}
@@ -68,54 +68,51 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
                 {body}
               </p>
             )}
-            <div className="pt-2 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase" style={{ color: colors.accent }}>
+            <div className="pt-1 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase" style={{ color: colors.accent }}>
               <span>Desliza para ver más</span>
               <ArrowRight className="w-3.5 h-3.5 animate-bounce-x" />
             </div>
           </div>
         ) : isCta ? (
-          <div className="space-y-6 text-center py-4">
+          <div className="space-y-4 text-center py-2">
             <div 
-              className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center border shadow-lg"
+              className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg shrink-0"
               style={{ 
                 backgroundColor: `${colors.accent}20`,
                 borderColor: colors.accent,
-                boxShadow: `0 0 25px ${colors.accent}30`
+                boxShadow: `0 0 20px ${colors.accent}30`
               }}
             >
-              <Sparkles className="w-7 h-7" style={{ color: colors.accent }} />
+              <Sparkles className="w-6 h-6" style={{ color: colors.accent }} />
             </div>
             
             <h2 
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight font-display"
+              className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug font-display"
               style={{ color: colors.text }}
             >
               {title}
             </h2>
 
             {body && (
-              <p 
-                className="text-sm sm:text-base leading-relaxed opacity-90 max-w-md mx-auto"
-                style={{ color: colors.text }}
+              <div 
+                className="p-4 rounded-xl border relative text-left"
+                style={{
+                  backgroundColor: `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}95`,
+                  borderColor: `${colors.accent}40`
+                }}
               >
-                {body}
-              </p>
+                <p 
+                  className="text-xs sm:text-sm leading-relaxed opacity-95 max-w-md mx-auto whitespace-pre-line font-sans"
+                  style={{ color: colors.text }}
+                >
+                  {body}
+                </p>
+              </div>
             )}
-
-            <div 
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm shadow-md transition-transform"
-              style={{
-                backgroundColor: colors.accent,
-                color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
-              }}
-            >
-              <span>Guardar & Compartir</span>
-              <CheckCircle2 className="w-4 h-4" />
-            </div>
           </div>
         ) : (
-          <div className="space-y-5">
-            <div className="space-y-2">
+          <div className="space-y-4">
+            <div className="space-y-1.5">
               <span className="text-xs font-mono font-bold tracking-wider" style={{ color: colors.accent }}>
                 // 0{index}
               </span>
@@ -135,7 +132,7 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
               }}
             >
               <p 
-                className="text-sm sm:text-base leading-relaxed opacity-90 whitespace-pre-line font-sans"
+                className="text-xs sm:text-sm leading-relaxed opacity-90 whitespace-pre-line font-sans"
                 style={{ color: colors.text }}
               >
                 {body || 'Añade el contenido clave aquí para complementar este paso del carrusel.'}
@@ -145,8 +142,8 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
         )}
       </div>
 
-      {/* Footer is handled by parent SlideCard for uniform watermark & numbering */}
-      <div className="h-6" />
+      {/* Footer spacing buffer */}
+      <div className="h-2 shrink-0" />
     </div>
   );
 }
