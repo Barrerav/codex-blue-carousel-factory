@@ -26,16 +26,55 @@ export function useCarousel() {
   const slideRefs = useRef([]);
   const exportContainerRef = useRef(null);
 
-  // Automatically re-parse when raw script changes
+  // Automatically re-parse when raw script changes while preserving uploaded images & overlays
   useEffect(() => {
     const parsed = parseScriptToSlides(script);
-    setSlides(parsed);
+    setSlides((prevSlides) => {
+      return parsed.map((newSlide, idx) => {
+        const existing = prevSlides[idx];
+        if (existing) {
+          return {
+            ...newSlide,
+            backgroundImage: existing.backgroundImage || null,
+            overlayOpacity: existing.overlayOpacity !== undefined ? existing.overlayOpacity : 0.65,
+          };
+        }
+        return newSlide;
+      });
+    });
   }, [script]);
 
   // Update a single slide without losing others
   const updateSlide = useCallback((updatedSlide) => {
     setSlides((prevSlides) =>
       prevSlides.map((s) => (s.id === updatedSlide.id ? updatedSlide : s))
+    );
+  }, []);
+
+  // Set or update background image for a specific slide
+  const updateSlideImage = useCallback((slideId, dataUrl) => {
+    setSlides((prevSlides) =>
+      prevSlides.map((s) =>
+        s.id === slideId ? { ...s, backgroundImage: dataUrl } : s
+      )
+    );
+  }, []);
+
+  // Remove background image from a specific slide
+  const removeSlideImage = useCallback((slideId) => {
+    setSlides((prevSlides) =>
+      prevSlides.map((s) =>
+        s.id === slideId ? { ...s, backgroundImage: null } : s
+      )
+    );
+  }, []);
+
+  // Adjust dark contrast overlay opacity for a specific slide
+  const updateSlideOverlay = useCallback((slideId, overlayOpacity) => {
+    setSlides((prevSlides) =>
+      prevSlides.map((s) =>
+        s.id === slideId ? { ...s, overlayOpacity } : s
+      )
     );
   }, []);
 
@@ -95,6 +134,9 @@ export function useCarousel() {
     activeSlideIndex,
     setActiveSlideIndex,
     updateSlide,
+    updateSlideImage,
+    removeSlideImage,
+    updateSlideOverlay,
     deleteSlide,
     resetScript,
     handleExportAll,

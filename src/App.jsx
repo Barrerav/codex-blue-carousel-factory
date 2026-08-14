@@ -19,6 +19,9 @@ export default function App() {
     activeSlideIndex,
     setActiveSlideIndex,
     updateSlide,
+    updateSlideImage,
+    removeSlideImage,
+    updateSlideOverlay,
     deleteSlide,
     resetScript,
     handleExportAll,
@@ -40,11 +43,17 @@ export default function App() {
 
       {/* 2-Panel Workstation Layout */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        {/* Left Side: Control Panel (Script, Colors, Templates, Branding) */}
+        {/* Left Side: Control Panel (Script, Background Images, Colors, Templates, Branding) */}
         <ControlPanel
           script={script}
           onScriptChange={setScript}
           onResetScript={resetScript}
+          slides={slides}
+          onUpdateSlideImage={updateSlideImage}
+          onRemoveSlideImage={removeSlideImage}
+          onUpdateSlideOverlay={updateSlideOverlay}
+          activeSlideIndex={activeSlideIndex}
+          onSelectSlide={setActiveSlideIndex}
           config={config}
           onConfigChange={setConfig}
         />

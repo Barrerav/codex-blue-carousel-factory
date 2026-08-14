@@ -10,6 +10,8 @@
  * @property {string} body
  * @property {string} [rawHeader]
  * @property {string} [tag]
+ * @property {string} [backgroundImage] - Base64 Data URL or image URL for custom background
+ * @property {number} [overlayOpacity] - Dark contrast overlay opacity (0 to 1, default: 0.65)
  * 
  * @typedef {Object} BrandColors
  * @property {string} primary - Background base color (Default: #070d1a)

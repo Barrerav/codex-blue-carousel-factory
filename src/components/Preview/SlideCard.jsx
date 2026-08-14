@@ -2,11 +2,11 @@ import React, { forwardRef } from 'react';
 import { MinimalTemplate } from '../Templates/MinimalTemplate';
 import { BoldTemplate } from '../Templates/BoldTemplate';
 import { EditorialTemplate } from '../Templates/EditorialTemplate';
-import { Edit3 } from 'lucide-react';
+import { Edit3, ImagePlus } from 'lucide-react';
 
 /**
  * SlideCard component with strict 4:5 aspect ratio, template rendering,
- * watermark, slide counter, and hover controls.
+ * custom background image support, contrast overlay, watermark, slide counter, and hover controls.
  */
 export const SlideCard = forwardRef(function SlideCard(
   {
@@ -20,17 +20,19 @@ export const SlideCard = forwardRef(function SlideCard(
   ref
 ) {
   const { template, brandColors, watermarkText, showWatermark, showSlideNumbers } = config;
+  const hasCustomBg = Boolean(slide.backgroundImage);
+  const overlayOpacity = slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65;
 
   // Select appropriate template component
   const renderTemplate = () => {
     switch (template) {
       case 'bold':
-        return <BoldTemplate slide={slide} colors={brandColors} isExport={isExport} />;
+        return <BoldTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
       case 'editorial':
-        return <EditorialTemplate slide={slide} colors={brandColors} isExport={isExport} />;
+        return <EditorialTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
       case 'minimal':
       default:
-        return <MinimalTemplate slide={slide} colors={brandColors} isExport={isExport} />;
+        return <MinimalTemplate slide={slide} colors={brandColors} isExport={isExport} hasCustomBg={hasCustomBg} />;
     }
   };
 
@@ -50,20 +52,39 @@ export const SlideCard = forwardRef(function SlideCard(
             : !isExport ? 'border-slate-800/80 hover:border-slate-700/80' : ''
         }`}
         style={{
-          backgroundColor: brandColors.primary,
+          backgroundColor: hasCustomBg ? '#000000' : brandColors.primary,
           color: brandColors.text,
         }}
       >
+        {/* Custom Background Image Layer */}
+        {hasCustomBg && (
+          <>
+            <img
+              src={slide.backgroundImage}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none"
+              style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+            />
+            {/* Automatic contrast scrim/overlay (dark gradient from top to bottom) */}
+            <div
+              className="absolute inset-0 z-[1] pointer-events-none"
+              style={{
+                background: `linear-gradient(180deg, rgba(7,13,26,${overlayOpacity * 0.65}) 0%, rgba(7,13,26,${overlayOpacity * 0.8}) 45%, rgba(7,13,26,${Math.min(0.98, overlayOpacity * 1.15)}) 100%)`,
+              }}
+            />
+          </>
+        )}
+
         {/* Template Layout Layer */}
-        <div className="w-full h-full flex flex-col">
+        <div className="w-full h-full flex flex-col relative z-10">
           {renderTemplate()}
         </div>
 
-        {/* Global Slide Footer: Watermark & Counter (Overlayed strictly in corners) */}
+        {/* Global Slide Footer: Watermark & Counter */}
         <div className="absolute bottom-6 left-8 right-8 flex items-center justify-between pointer-events-none z-20">
           {/* Watermark Logo */}
           {showWatermark && (
-            <div className="flex items-center gap-1.5 opacity-70">
+            <div className="flex items-center gap-1.5 opacity-80 drop-shadow-md">
               <span className="w-2 h-2 rounded-sm" style={{ backgroundColor: brandColors.accent }} />
               <span 
                 className="text-xs font-mono font-bold tracking-[0.25em] uppercase"
@@ -77,7 +98,7 @@ export const SlideCard = forwardRef(function SlideCard(
           {/* Slide Counter */}
           {showSlideNumbers && (
             <div 
-              className="text-xs font-mono font-semibold tracking-wider opacity-70 ml-auto"
+              className="text-xs font-mono font-semibold tracking-wider opacity-80 ml-auto drop-shadow-md"
               style={{ color: brandColors.text }}
             >
               {slide.index} / {slide.totalSlides}
@@ -88,14 +109,14 @@ export const SlideCard = forwardRef(function SlideCard(
 
       {/* Hover Action Overlay (Disabled during export) */}
       {!isExport && onEdit && (
-        <div className="export-ignore absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex items-center gap-1.5 bg-slate-950/80 backdrop-blur-md p-1 rounded-xl border border-slate-700/50 shadow-lg">
+        <div className="export-ignore absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 flex items-center gap-1.5 bg-slate-950/85 backdrop-blur-md p-1 rounded-xl border border-slate-700/50 shadow-lg">
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit(slide);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm cursor-pointer"
-            title="Editar texto de este slide"
+            title="Editar texto e imagen de este slide"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>Editar</span>

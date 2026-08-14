@@ -5,7 +5,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
  * Minimal Template - Technical, Clean Swiss Design
  * Modern typography, subtle borders, high negative space.
  */
-export function MinimalTemplate({ slide, colors, isExport = false }) {
+export function MinimalTemplate({ slide, colors, isExport = false, hasCustomBg = false }) {
   const { type, title, body, index, totalSlides, tag } = slide;
   const isHook = type === 'hook';
   const isCta = type === 'cta';
@@ -14,30 +14,34 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
     <div 
       className="w-full h-full flex flex-col justify-between p-8 sm:p-10 pb-14 relative overflow-hidden"
       style={{
-        backgroundColor: colors.primary,
+        backgroundColor: hasCustomBg ? 'transparent' : colors.primary,
         color: colors.text,
       }}
     >
-      {/* Background Tech Grid / Radial Glow */}
-      <div 
-        className="absolute inset-0 opacity-10 pointer-events-none"
-        style={{
-          backgroundImage: `radial-gradient(${colors.accent} 1px, transparent 1px)`,
-          backgroundSize: '24px 24px'
-        }}
-      />
-      <div 
-        className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none"
-        style={{ backgroundColor: colors.accent }}
-      />
+      {/* Background Tech Grid / Radial Glow (Only when no custom photo background) */}
+      {!hasCustomBg && (
+        <>
+          <div 
+            className="absolute inset-0 opacity-10 pointer-events-none"
+            style={{
+              backgroundImage: `radial-gradient(${colors.accent} 1px, transparent 1px)`,
+              backgroundSize: '24px 24px'
+            }}
+          />
+          <div 
+            className="absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none"
+            style={{ backgroundColor: colors.accent }}
+          />
+        </>
+      )}
 
       {/* Header Area: Tag / Step Pill */}
       <div className="relative z-10 flex items-center justify-between shrink-0">
         <div 
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all"
+          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-widest border transition-all backdrop-blur-sm shadow-sm"
           style={{
-            borderColor: `${colors.accent}40`,
-            backgroundColor: `${colors.accent}15`,
+            borderColor: `${colors.accent}60`,
+            backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.7)' : `${colors.accent}15`,
             color: colors.accent
           }}
         >
@@ -51,24 +55,24 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
         {isHook ? (
           <div className="space-y-5">
             <div 
-              className="w-12 h-1 rounded-full"
+              className="w-12 h-1 rounded-full shadow-sm"
               style={{ backgroundColor: colors.accent }}
             />
             <h1 
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.25] font-display"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.25] font-display drop-shadow-md"
               style={{ color: colors.text }}
             >
               {title}
             </h1>
             {body && (
               <p 
-                className="text-sm sm:text-base font-normal leading-relaxed opacity-85"
+                className="text-sm sm:text-base font-normal leading-relaxed opacity-90 drop-shadow"
                 style={{ color: colors.text }}
               >
                 {body}
               </p>
             )}
-            <div className="pt-1 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase" style={{ color: colors.accent }}>
+            <div className="pt-1 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase drop-shadow" style={{ color: colors.accent }}>
               <span>Desliza para ver más</span>
               <ArrowRight className="w-3.5 h-3.5 animate-bounce-x" />
             </div>
@@ -76,10 +80,10 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
         ) : isCta ? (
           <div className="space-y-4 text-center py-2">
             <div 
-              className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg shrink-0"
+              className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg shrink-0 backdrop-blur-md"
               style={{ 
-                backgroundColor: `${colors.accent}20`,
-                borderColor: colors.accent,
+                backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.accent}20`,
+                borderColor: `${colors.accent}60`,
                 boxShadow: `0 0 20px ${colors.accent}30`
               }}
             >
@@ -87,7 +91,7 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
             </div>
             
             <h2 
-              className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug font-display"
+              className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug font-display drop-shadow-md"
               style={{ color: colors.text }}
             >
               {title}
@@ -95,9 +99,9 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
 
             {body && (
               <div 
-                className="p-4 rounded-xl border relative text-left"
+                className="p-4 rounded-xl border relative text-left backdrop-blur-md shadow-lg"
                 style={{
-                  backgroundColor: `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}95`,
+                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.8)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}95`,
                   borderColor: `${colors.accent}40`
                 }}
               >
@@ -113,11 +117,11 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
         ) : (
           <div className="space-y-4">
             <div className="space-y-1.5">
-              <span className="text-xs font-mono font-bold tracking-wider" style={{ color: colors.accent }}>
+              <span className="text-xs font-mono font-bold tracking-wider drop-shadow" style={{ color: colors.accent }}>
                 // 0{index}
               </span>
               <h2 
-                className="text-xl sm:text-2xl font-bold tracking-tight leading-snug font-display"
+                className="text-xl sm:text-2xl font-bold tracking-tight leading-snug font-display drop-shadow-md"
                 style={{ color: colors.text }}
               >
                 {title}
@@ -125,14 +129,14 @@ export function MinimalTemplate({ slide, colors, isExport = false }) {
             </div>
 
             <div 
-              className="p-4 rounded-xl border relative"
+              className="p-4 rounded-xl border relative backdrop-blur-md shadow-lg"
               style={{
-                backgroundColor: `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}90`,
-                borderColor: `${colors.accent}30`
+                backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}90`,
+                borderColor: `${colors.accent}35`
               }}
             >
               <p 
-                className="text-xs sm:text-sm leading-relaxed opacity-90 whitespace-pre-line font-sans"
+                className="text-xs sm:text-sm leading-relaxed opacity-95 whitespace-pre-line font-sans"
                 style={{ color: colors.text }}
               >
                 {body || 'Añade el contenido clave aquí para complementar este paso del carrusel.'}

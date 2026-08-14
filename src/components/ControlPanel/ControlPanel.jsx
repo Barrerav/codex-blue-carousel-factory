@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { ScriptEditor } from './ScriptEditor';
+import { SlideImageManager } from './SlideImageManager';
 import { BrandColorPicker } from './BrandColorPicker';
 import { TemplateSelector } from './TemplateSelector';
-import { Sliders, ShieldCheck, Eye, EyeOff, Hash, Layers } from 'lucide-react';
+import { Sliders, ShieldCheck, Eye, EyeOff, Hash, Layers, Image as ImageIcon } from 'lucide-react';
 
 export function ControlPanel({
   script,
   onScriptChange,
   onResetScript,
+  slides,
+  onUpdateSlideImage,
+  onRemoveSlideImage,
+  onUpdateSlideOverlay,
+  activeSlideIndex,
+  onSelectSlide,
   config,
   onConfigChange,
 }) {
@@ -19,19 +26,19 @@ export function ControlPanel({
       <div className="flex items-center border-b border-slate-800/80 bg-slate-950/40 p-2 gap-1.5 shrink-0">
         <button
           onClick={() => setActiveTab('script')}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'script'
               ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
           }`}
         >
           <Sliders className="w-3.5 h-3.5" />
-          <span>1. Guion</span>
+          <span>1. Guion & Fondos</span>
         </button>
 
         <button
           onClick={() => setActiveTab('design')}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'design'
               ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -43,7 +50,7 @@ export function ControlPanel({
 
         <button
           onClick={() => setActiveTab('options')}
-          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
             activeTab === 'options'
               ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30 shadow-sm'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/50'
@@ -57,11 +64,27 @@ export function ControlPanel({
       {/* Panel Scrollable Content */}
       <div className="flex-1 overflow-y-auto p-5 space-y-6">
         {activeTab === 'script' && (
-          <ScriptEditor
-            script={script}
-            onChange={onScriptChange}
-            onResetDefault={onResetScript}
-          />
+          <div className="space-y-6">
+            <ScriptEditor
+              script={script}
+              onChange={onScriptChange}
+              onResetDefault={onResetScript}
+            />
+
+            {/* Per-Slide Custom Background Image Uploader List */}
+            {slides.length > 0 && (
+              <div className="border-t border-slate-800/80 pt-5">
+                <SlideImageManager
+                  slides={slides}
+                  onUpdateSlideImage={onUpdateSlideImage}
+                  onRemoveSlideImage={onRemoveSlideImage}
+                  onUpdateSlideOverlay={onUpdateSlideOverlay}
+                  activeSlideIndex={activeSlideIndex}
+                  onSelectSlide={onSelectSlide}
+                />
+              </div>
+            )}
+          </div>
         )}
 
         {activeTab === 'design' && (
@@ -93,7 +116,7 @@ export function ControlPanel({
                   <button
                     type="button"
                     onClick={() => onConfigChange({ ...config, showWatermark: !config.showWatermark })}
-                    className={`p-1.5 rounded-lg border text-xs font-semibold transition-all flex items-center gap-1 ${
+                    className={`p-1.5 rounded-lg border text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
                       config.showWatermark
                         ? 'bg-blue-500/20 text-blue-400 border-blue-500/40'
                         : 'bg-slate-900 text-slate-500 border-slate-800'
@@ -132,7 +155,7 @@ export function ControlPanel({
                 <button
                   type="button"
                   onClick={() => onConfigChange({ ...config, showSlideNumbers: !config.showSlideNumbers })}
-                  className={`p-1.5 rounded-lg border text-xs font-semibold transition-all flex items-center gap-1 ${
+                  className={`p-1.5 rounded-lg border text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
                     config.showSlideNumbers
                       ? 'bg-blue-500/20 text-blue-400 border-blue-500/40'
                       : 'bg-slate-900 text-slate-500 border-slate-800'
