@@ -1,9 +1,10 @@
 import React from 'react';
 import { Flame, ArrowUpRight, Zap } from 'lucide-react';
+import { getTextWidthClass, getTextPositionClasses } from '../../utils/layoutUtils';
 
 /**
  * Bold / Alto Contraste Template - High Impact & Authority
- * Supports textPosition, highlight callouts, and custom image backgrounds.
+ * Supports textPosition, textWidth, highlight callouts, and custom image backgrounds.
  */
 export function BoldTemplate({
   slide,
@@ -11,6 +12,7 @@ export function BoldTemplate({
   isExport = false,
   hasCustomBg = false,
   textPosition = 'center',
+  textWidth = 'wide',
   highlight = '',
   hasLogoTop = false,
 }) {
@@ -18,21 +20,8 @@ export function BoldTemplate({
   const isHook = type === 'hook';
   const isCta = type === 'cta';
 
-  const getTextPositionClasses = (pos) => {
-    switch (pos) {
-      case 'top':
-        return 'mt-1 mb-auto justify-start';
-      case 'upper-center':
-        return 'mt-6 mb-auto justify-start';
-      case 'lower-center':
-        return 'mt-auto mb-6 justify-end';
-      case 'bottom':
-        return 'mt-auto mb-1 justify-end';
-      case 'center':
-      default:
-        return 'my-auto justify-center';
-    }
-  };
+  const positionClasses = getTextPositionClasses(textPosition, hasLogoTop);
+  const widthClasses = getTextWidthClass(textWidth);
 
   return (
     <div 
@@ -72,144 +61,146 @@ export function BoldTemplate({
         </div>
       )}
 
-      {/* Main Content Area with Dynamic Text Position */}
-      <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
-        {isHook ? (
-          <div className="space-y-4">
-            <h1 
-              className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.1] font-sans drop-shadow-lg"
-              style={{ color: colors.text }}
-            >
-              {title}
-            </h1>
-
-            {/* Optional Highlight Callout */}
-            {highlight && (
-              <div 
-                className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg"
-                style={{
-                  backgroundColor: colors.accent,
-                  color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
-                }}
-              >
-                <Zap className="w-3.5 h-3.5 fill-current" />
-                <span>{highlight}</span>
-              </div>
-            )}
-            
-            {body && (
-              <div 
-                className="p-4 rounded-xl border-l-4 shadow-md backdrop-blur-md"
-                style={{
-                  borderLeftColor: colors.accent,
-                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.accent}15`,
-                  color: colors.text
-                }}
-              >
-                <p className="text-sm sm:text-base font-semibold opacity-95 whitespace-pre-line">
-                  {body}
-                </p>
-              </div>
-            )}
-
-            <div className="pt-1 flex items-center gap-3">
-              <span 
-                className="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md"
-                style={{
-                  backgroundColor: colors.accent,
-                  color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
-                }}
-              >
-                <span>DESLIZA</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </span>
-            </div>
-          </div>
-        ) : isCta ? (
-          <div className="space-y-4 text-left py-2">
-            <div 
-              className="w-12 h-2 rounded-full shadow-sm"
-              style={{ backgroundColor: colors.accent }}
-            />
-            
-            <h2 
-              className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-snug font-sans drop-shadow-lg"
-              style={{ color: colors.text }}
-            >
-              {title}
-            </h2>
-
-            {/* Optional Highlight Callout */}
-            {highlight && (
-              <div 
-                className="px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-md"
-                style={{
-                  backgroundColor: colors.accent,
-                  color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
-                }}
-              >
-                <span>⚡ {highlight}</span>
-              </div>
-            )}
-
-            {body && (
-              <div 
-                className="p-4 rounded-2xl border-l-4 backdrop-blur-md shadow-lg"
-                style={{
-                  borderLeftColor: colors.accent,
-                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.8)' : `${colors.accent}15`
-                }}
-              >
-                <p className="text-xs sm:text-sm font-bold leading-relaxed opacity-95 whitespace-pre-line">
-                  {body}
-                </p>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3.5">
-            <div className="flex items-start gap-3">
-              <div className="space-y-1">
-                <h2 
-                  className="text-xl sm:text-2xl font-black tracking-tight leading-tight uppercase font-sans drop-shadow-md"
-                  style={{ color: colors.text }}
-                >
-                  {title}
-                </h2>
-              </div>
-            </div>
-
-            {/* Optional Highlight Callout */}
-            {highlight && (
-              <div 
-                className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide flex items-center gap-1.5 shadow-md"
-                style={{
-                  backgroundColor: `${colors.accent}30`,
-                  borderLeft: `3px solid ${colors.accent}`,
-                  color: colors.text
-                }}
-              >
-                <Zap className="w-3 h-3 text-blue-400 fill-current" />
-                <span>{highlight}</span>
-              </div>
-            )}
-
-            <div 
-              className="p-4 rounded-2xl border backdrop-blur-md shadow-lg"
-              style={{
-                backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.primary === '#070d1a' ? '#0f1b33' : colors.primary}99`,
-                borderColor: `${colors.accent}40`
-              }}
-            >
-              <p 
-                className="text-xs sm:text-sm font-medium leading-relaxed opacity-95 whitespace-pre-line"
+      {/* Main Content Area with Dynamic Text Position & Text Width */}
+      <div className={`relative z-10 flex flex-col overflow-hidden ${positionClasses}`}>
+        <div className={widthClasses}>
+          {isHook ? (
+            <div className="space-y-4">
+              <h1 
+                className="text-3xl sm:text-4xl font-black uppercase tracking-tight leading-[1.1] font-sans drop-shadow-lg"
                 style={{ color: colors.text }}
               >
-                {body}
-              </p>
+                {title}
+              </h1>
+
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 shadow-lg"
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+                  }}
+                >
+                  <Zap className="w-3.5 h-3.5 fill-current" />
+                  <span>{highlight}</span>
+                </div>
+              )}
+              
+              {body && (
+                <div 
+                  className="p-4 rounded-xl border-l-4 shadow-md backdrop-blur-md"
+                  style={{
+                    borderLeftColor: colors.accent,
+                    backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.accent}15`,
+                    color: colors.text
+                  }}
+                >
+                  <p className="text-sm sm:text-base font-semibold opacity-95 whitespace-pre-line">
+                    {body}
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-1 flex items-center gap-3">
+                <span 
+                  className="px-4 py-2 rounded-lg text-xs font-black uppercase tracking-widest flex items-center gap-1.5 shadow-md"
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+                  }}
+                >
+                  <span>DESLIZA</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </span>
+              </div>
             </div>
-          </div>
-        )}
+          ) : isCta ? (
+            <div className="space-y-4 text-left py-2">
+              <div 
+                className="w-12 h-2 rounded-full shadow-sm"
+                style={{ backgroundColor: colors.accent }}
+              />
+              
+              <h2 
+                className="text-2xl sm:text-3xl font-black uppercase tracking-tight leading-snug font-sans drop-shadow-lg"
+                style={{ color: colors.text }}
+              >
+                {title}
+              </h2>
+
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 shadow-md"
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.primary === '#ffffff' ? '#000000' : '#ffffff'
+                  }}
+                >
+                  <span>⚡ {highlight}</span>
+                </div>
+              )}
+
+              {body && (
+                <div 
+                  className="p-4 rounded-2xl border-l-4 backdrop-blur-md shadow-lg"
+                  style={{
+                    borderLeftColor: colors.accent,
+                    backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.8)' : `${colors.accent}15`
+                  }}
+                >
+                  <p className="text-xs sm:text-sm font-bold leading-relaxed opacity-95 whitespace-pre-line">
+                    {body}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3.5">
+              <div className="flex items-start gap-3">
+                <div className="space-y-1">
+                  <h2 
+                    className="text-xl sm:text-2xl font-black tracking-tight leading-tight uppercase font-sans drop-shadow-md"
+                    style={{ color: colors.text }}
+                  >
+                    {title}
+                  </h2>
+                </div>
+              </div>
+
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wide flex items-center gap-1.5 shadow-md"
+                  style={{
+                    backgroundColor: `${colors.accent}30`,
+                    borderLeft: `3px solid ${colors.accent}`,
+                    color: colors.text
+                  }}
+                >
+                  <Zap className="w-3 h-3 text-blue-400 fill-current" />
+                  <span>{highlight}</span>
+                </div>
+              )}
+
+              <div 
+                className="p-4 rounded-2xl border backdrop-blur-md shadow-lg"
+                style={{
+                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.primary === '#070d1a' ? '#0f1b33' : colors.primary}99`,
+                  borderColor: `${colors.accent}40`
+                }}
+              >
+                <p 
+                  className="text-xs sm:text-sm font-medium leading-relaxed opacity-95 whitespace-pre-line"
+                  style={{ color: colors.text }}
+                >
+                  {body}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="h-2 shrink-0" />

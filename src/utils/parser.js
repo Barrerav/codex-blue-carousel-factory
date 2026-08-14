@@ -15,6 +15,41 @@ function normalizeTextPosition(val) {
 }
 
 /**
+ * Normalize Text Width string
+ * @param {string} val
+ * @returns {'narrow' | 'medium' | 'wide'}
+ */
+function normalizeTextWidth(val) {
+  if (!val) return 'wide';
+  const clean = val.trim().toLowerCase().replace(/[_ ]+/g, '-');
+  if (['narrow', 'medium', 'wide'].includes(clean)) {
+    return /** @type {any} */ (clean);
+  }
+  if (clean === 'estrecho' || clean === 'corto') return 'narrow';
+  if (clean === 'medio' || clean === 'intermedio') return 'medium';
+  if (clean === 'ancho' || clean === 'completo') return 'wide';
+  return 'wide';
+}
+
+/**
+ * Normalize Visual Focus string
+ * @param {string} val
+ * @returns {'left' | 'center' | 'right' | 'full'}
+ */
+function normalizeVisualFocus(val) {
+  if (!val) return 'center';
+  const clean = val.trim().toLowerCase().replace(/[_ ]+/g, '-');
+  if (['left', 'center', 'right', 'full'].includes(clean)) {
+    return /** @type {any} */ (clean);
+  }
+  if (clean === 'izquierda') return 'left';
+  if (clean === 'centro') return 'center';
+  if (clean === 'derecha') return 'right';
+  if (clean === 'todo' || clean === 'completo') return 'full';
+  return 'center';
+}
+
+/**
  * Normalize Logo Position string
  * @param {string} val 
  * @returns {'global' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'}
@@ -36,7 +71,7 @@ function normalizeLogoPosition(val) {
  * Parse raw carousel script into an array of structured Slide objects.
  * 
  * Supports:
- * - Structured ChatGPT Format (TYPE, TITLE, BODY, HIGHLIGHT, VISUAL, PROMPT, TEXT_POSITION, LOGO_POSITION)
+ * - Structured ChatGPT Format (TYPE, TITLE, BODY, HIGHLIGHT, VISUAL, PROMPT, TEXT_POSITION, TEXT_WIDTH, VISUAL_FOCUS, LOGO_POSITION)
  * - Legacy Pipe Format: SLIDE 1 (HOOK): [hook text] | SLIDE N: [title] | [body]
  * - Plain Multiline and paragraph variations
  * 
@@ -124,7 +159,7 @@ export function parseScriptToSlides(rawText) {
     const isLast = idx === totalSlides - 1;
 
     // Check if this block contains structured key-value lines
-    const structuredKeyRegex = /^(TYPE|TAG|TITLE|BODY|HIGHLIGHT|VISUAL|PROMPT|TEXT_POSITION|TEXT POSITION|LOGO_POSITION|LOGO POSITION)\s*[:：]\s*(.*)$/i;
+    const structuredKeyRegex = /^(TYPE|TAG|TITLE|BODY|HIGHLIGHT|VISUAL|PROMPT|TEXT_POSITION|TEXT POSITION|TEXT_WIDTH|TEXT WIDTH|VISUAL_FOCUS|VISUAL FOCUS|LOGO_POSITION|LOGO POSITION)\s*[:：]\s*(.*)$/i;
     const hasStructuredKeys = block.lines.some(l => structuredKeyRegex.test(l.trim()));
 
     if (hasStructuredKeys) {
@@ -138,6 +173,8 @@ export function parseScriptToSlides(rawText) {
         visualConcept: '',
         visualPrompt: '',
         textPosition: 'center',
+        textWidth: 'wide',
+        visualFocus: 'center',
         logoPosition: 'global'
       };
 
@@ -185,6 +222,14 @@ export function parseScriptToSlides(rawText) {
               currentField = 'textPosition';
               fields.textPosition = normalizeTextPosition(value);
               break;
+            case 'TEXT_WIDTH':
+              currentField = 'textWidth';
+              fields.textWidth = normalizeTextWidth(value);
+              break;
+            case 'VISUAL_FOCUS':
+              currentField = 'visualFocus';
+              fields.visualFocus = normalizeVisualFocus(value);
+              break;
             case 'LOGO_POSITION':
               currentField = 'logoPosition';
               fields.logoPosition = normalizeLogoPosition(value);
@@ -229,6 +274,8 @@ export function parseScriptToSlides(rawText) {
         visualConcept: fields.visualConcept || '',
         visualPrompt: fields.visualPrompt || '',
         textPosition: normalizeTextPosition(fields.textPosition),
+        textWidth: normalizeTextWidth(fields.textWidth),
+        visualFocus: normalizeVisualFocus(fields.visualFocus),
         logoPosition: normalizeLogoPosition(fields.logoPosition),
         backgroundImage: null,
         overlayOpacity: 0.65,
@@ -304,6 +351,8 @@ export function parseScriptToSlides(rawText) {
       visualConcept: '',
       visualPrompt: '',
       textPosition: 'center',
+      textWidth: 'wide',
+      visualFocus: 'center',
       logoPosition: 'global',
       backgroundImage: null,
       overlayOpacity: 0.65,

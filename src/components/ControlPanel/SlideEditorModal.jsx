@@ -13,7 +13,10 @@ import {
   Layout,
   Compass,
   Zap,
+  Maximize,
+  Focus,
 } from 'lucide-react';
+import { VISUAL_FOCUS_HINTS } from '../../utils/layoutUtils';
 
 export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
   if (!isOpen || !slide) return null;
@@ -26,6 +29,8 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
   const [visualConcept, setVisualConcept] = useState(slide.visualConcept || '');
   const [visualPrompt, setVisualPrompt] = useState(slide.visualPrompt || '');
   const [textPosition, setTextPosition] = useState(slide.textPosition || 'center');
+  const [textWidth, setTextWidth] = useState(slide.textWidth || 'wide');
+  const [visualFocus, setVisualFocus] = useState(slide.visualFocus || 'center');
   const [logoPosition, setLogoPosition] = useState(slide.logoPosition || 'global');
   const [backgroundImage, setBackgroundImage] = useState(slide.backgroundImage || null);
   const [overlayOpacity, setOverlayOpacity] = useState(
@@ -44,6 +49,8 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
     setVisualConcept(slide.visualConcept || '');
     setVisualPrompt(slide.visualPrompt || '');
     setTextPosition(slide.textPosition || 'center');
+    setTextWidth(slide.textWidth || 'wide');
+    setVisualFocus(slide.visualFocus || 'center');
     setLogoPosition(slide.logoPosition || 'global');
     setBackgroundImage(slide.backgroundImage || null);
     setOverlayOpacity(slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65);
@@ -89,6 +96,8 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
       visualConcept: visualConcept.trim(),
       visualPrompt: visualPrompt.trim(),
       textPosition,
+      textWidth,
+      visualFocus,
       logoPosition,
       backgroundImage,
       overlayOpacity,
@@ -113,7 +122,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                 Editar Slide #{slide.index} de {slide.totalSlides}
               </h3>
               <p className="text-xs text-slate-400">
-                Ajusta contenido, dirección visual, prompt Gemini y fondo.
+                Ajusta contenido, dirección de composición, prompt Gemini y fondo.
               </p>
             </div>
           </div>
@@ -169,7 +178,7 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                   type="text"
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
-                  placeholder="Ej: HOOK, 01, CTA"
+                  placeholder="Ej: HOOK, 01, CTA (Dejar vacío para ocultar)"
                   className="w-full bg-slate-950/70 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
@@ -217,13 +226,13 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
             </div>
           </div>
 
-          {/* SECTION 2: DIRECCIÓN VISUAL */}
+          {/* SECTION 2: DIRECCIÓN VISUAL Y COMPOSICIÓN */}
           <div className="space-y-4 p-4 rounded-xl bg-slate-950/60 border border-purple-500/30">
             <div className="flex items-center justify-between pb-1 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Compass className="w-4 h-4 text-purple-400" />
                 <h4 className="text-xs font-bold uppercase tracking-wider text-purple-300">
-                  Dirección Visual & Prompt Gemini
+                  Dirección Visual & Composición
                 </h4>
               </div>
 
@@ -267,8 +276,8 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
               />
             </div>
 
-            {/* Layout Positioning: Text Position & Logo Position */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            {/* Composition Grid: Text Position, Text Width, Visual Focus, Logo Position */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800/80">
               {/* Text Position */}
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
@@ -288,8 +297,68 @@ export function SlideEditorModal({ isOpen, slide, onClose, onSave, onDelete }) {
                 </select>
               </div>
 
-              {/* Logo Position */}
+              {/* Text Width */}
               <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  <Maximize className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Anchura del Texto</span>
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { id: 'narrow', label: 'Narrow (~50%)' },
+                    { id: 'medium', label: 'Medium (~70%)' },
+                    { id: 'wide', label: 'Wide (~90%)' },
+                  ].map((w) => (
+                    <button
+                      key={w.id}
+                      type="button"
+                      onClick={() => setTextWidth(w.id)}
+                      className={`py-1.5 px-2 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                        textWidth === w.id
+                          ? 'bg-blue-600 border-blue-500 text-white shadow-sm'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      {w.id.charAt(0).toUpperCase() + w.id.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Visual Focus */}
+              <div className="space-y-1 sm:col-span-1">
+                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
+                  <Focus className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Foco Visual de la Imagen</span>
+                </label>
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { id: 'left', label: 'Left' },
+                    { id: 'center', label: 'Center' },
+                    { id: 'right', label: 'Right' },
+                    { id: 'full', label: 'Full' },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setVisualFocus(f.id)}
+                      className={`py-1.5 px-1.5 rounded-lg text-[11px] font-semibold border transition-all cursor-pointer ${
+                        visualFocus === f.id
+                          ? 'bg-purple-600 border-purple-500 text-white shadow-sm'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-purple-300/80 italic pt-0.5">
+                  💡 {VISUAL_FOCUS_HINTS[visualFocus] || VISUAL_FOCUS_HINTS.center}
+                </p>
+              </div>
+
+              {/* Logo Position */}
+              <div className="space-y-1 sm:col-span-1">
                 <label className="text-xs font-semibold text-slate-300 flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5 text-blue-400" />
                   <span>Posición del Logo en Slide</span>

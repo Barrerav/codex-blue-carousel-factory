@@ -1,9 +1,10 @@
 import React from 'react';
 import { ArrowRight, Sparkles, Zap } from 'lucide-react';
+import { getTextWidthClass, getTextPositionClasses } from '../../utils/layoutUtils';
 
 /**
  * Minimal Template - Technical, Clean Swiss Design
- * Supports textPosition, highlight callouts, and custom image backgrounds.
+ * Supports textPosition, textWidth, highlight callouts, and custom image backgrounds.
  */
 export function MinimalTemplate({
   slide,
@@ -11,6 +12,7 @@ export function MinimalTemplate({
   isExport = false,
   hasCustomBg = false,
   textPosition = 'center',
+  textWidth = 'wide',
   highlight = '',
   hasLogoTop = false,
 }) {
@@ -18,21 +20,8 @@ export function MinimalTemplate({
   const isHook = type === 'hook';
   const isCta = type === 'cta';
 
-  const getTextPositionClasses = (pos) => {
-    switch (pos) {
-      case 'top':
-        return 'mt-1 mb-auto justify-start';
-      case 'upper-center':
-        return 'mt-6 mb-auto justify-start';
-      case 'lower-center':
-        return 'mt-auto mb-6 justify-end';
-      case 'bottom':
-        return 'mt-auto mb-1 justify-end';
-      case 'center':
-      default:
-        return 'my-auto justify-center';
-    }
-  };
+  const positionClasses = getTextPositionClasses(textPosition, hasLogoTop);
+  const widthClasses = getTextWidthClass(textWidth);
 
   return (
     <div 
@@ -76,143 +65,145 @@ export function MinimalTemplate({
         </div>
       )}
 
-      {/* Main Content Area with Dynamic Text Position */}
-      <div className={`relative z-10 flex flex-col overflow-hidden ${getTextPositionClasses(textPosition)}`}>
-        {isHook ? (
-          <div className="space-y-4">
-            <div 
-              className="w-12 h-1 rounded-full shadow-sm"
-              style={{ backgroundColor: colors.accent }}
-            />
-            <h1 
-              className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.25] font-display drop-shadow-md"
-              style={{ color: colors.text }}
-            >
-              {title}
-            </h1>
-
-            {/* Optional Highlight Callout */}
-            {highlight && (
+      {/* Main Content Area with Dynamic Text Position & Text Width */}
+      <div className={`relative z-10 flex flex-col overflow-hidden ${positionClasses}`}>
+        <div className={widthClasses}>
+          {isHook ? (
+            <div className="space-y-4">
               <div 
-                className="p-3 rounded-xl border flex items-center gap-2 text-xs font-semibold backdrop-blur-md shadow-sm"
-                style={{
-                  borderColor: `${colors.accent}60`,
-                  backgroundColor: `${colors.accent}20`,
-                  color: colors.text
-                }}
-              >
-                <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
-                <span>{highlight}</span>
-              </div>
-            )}
-
-            {body && (
-              <p 
-                className="text-sm sm:text-base font-normal leading-relaxed opacity-90 drop-shadow whitespace-pre-line"
+                className="w-12 h-1 rounded-full shadow-sm"
+                style={{ backgroundColor: colors.accent }}
+              />
+              <h1 
+                className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-[1.25] font-display drop-shadow-md"
                 style={{ color: colors.text }}
               >
-                {body}
-              </p>
-            )}
-            
-            <div className="pt-1 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase drop-shadow" style={{ color: colors.accent }}>
-              <span>Desliza para ver más</span>
-              <ArrowRight className="w-3.5 h-3.5 animate-bounce-x" />
-            </div>
-          </div>
-        ) : isCta ? (
-          <div className="space-y-4 text-center py-2">
-            <div 
-              className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg shrink-0 backdrop-blur-md"
-              style={{ 
-                backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.accent}20`,
-                borderColor: `${colors.accent}60`,
-                boxShadow: `0 0 20px ${colors.accent}30`
-              }}
-            >
-              <Sparkles className="w-6 h-6" style={{ color: colors.accent }} />
-            </div>
-            
-            <h2 
-              className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug font-display drop-shadow-md"
-              style={{ color: colors.text }}
-            >
-              {title}
-            </h2>
+                {title}
+              </h1>
 
-            {/* Optional Highlight Callout */}
-            {highlight && (
-              <div 
-                className="p-2.5 rounded-xl border inline-block text-xs font-semibold backdrop-blur-md shadow-sm mx-auto"
-                style={{
-                  borderColor: `${colors.accent}60`,
-                  backgroundColor: `${colors.accent}20`,
-                  color: colors.text
-                }}
-              >
-                <span>✨ {highlight}</span>
-              </div>
-            )}
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="p-3 rounded-xl border flex items-center gap-2 text-xs font-semibold backdrop-blur-md shadow-sm"
+                  style={{
+                    borderColor: `${colors.accent}60`,
+                    backgroundColor: `${colors.accent}20`,
+                    color: colors.text
+                  }}
+                >
+                  <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+                  <span>{highlight}</span>
+                </div>
+              )}
 
-            {body && (
-              <div 
-                className="p-4 rounded-xl border relative text-left backdrop-blur-md shadow-lg"
-                style={{
-                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.8)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}95`,
-                  borderColor: `${colors.accent}40`
-                }}
-              >
+              {body && (
                 <p 
-                  className="text-xs sm:text-sm leading-relaxed opacity-95 max-w-md mx-auto whitespace-pre-line font-sans"
+                  className="text-sm sm:text-base font-normal leading-relaxed opacity-90 drop-shadow whitespace-pre-line"
                   style={{ color: colors.text }}
                 >
                   {body}
                 </p>
+              )}
+              
+              <div className="pt-1 flex items-center gap-2 text-xs font-semibold tracking-wider uppercase drop-shadow" style={{ color: colors.accent }}>
+                <span>Desliza para ver más</span>
+                <ArrowRight className="w-3.5 h-3.5 animate-bounce-x" />
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3.5">
-            <div className="space-y-1">
+            </div>
+          ) : isCta ? (
+            <div className="space-y-4 text-center py-2">
+              <div 
+                className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center border shadow-lg shrink-0 backdrop-blur-md"
+                style={{ 
+                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.accent}20`,
+                  borderColor: `${colors.accent}60`,
+                  boxShadow: `0 0 20px ${colors.accent}30`
+                }}
+              >
+                <Sparkles className="w-6 h-6" style={{ color: colors.accent }} />
+              </div>
+              
               <h2 
-                className="text-xl sm:text-2xl font-bold tracking-tight leading-snug font-display drop-shadow-md"
+                className="text-xl sm:text-2xl font-extrabold tracking-tight leading-snug font-display drop-shadow-md"
                 style={{ color: colors.text }}
               >
                 {title}
               </h2>
-            </div>
 
-            {/* Optional Highlight Callout */}
-            {highlight && (
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="p-2.5 rounded-xl border inline-block text-xs font-semibold backdrop-blur-md shadow-sm mx-auto"
+                  style={{
+                    borderColor: `${colors.accent}60`,
+                    backgroundColor: `${colors.accent}20`,
+                    color: colors.text
+                  }}
+                >
+                  <span>✨ {highlight}</span>
+                </div>
+              )}
+
+              {body && (
+                <div 
+                  className="p-4 rounded-xl border relative text-left backdrop-blur-md shadow-lg"
+                  style={{
+                    backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.8)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}95`,
+                    borderColor: `${colors.accent}40`
+                  }}
+                >
+                  <p 
+                    className="text-xs sm:text-sm leading-relaxed opacity-95 max-w-md mx-auto whitespace-pre-line font-sans"
+                    style={{ color: colors.text }}
+                  >
+                    {body}
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3.5">
+              <div className="space-y-1">
+                <h2 
+                  className="text-xl sm:text-2xl font-bold tracking-tight leading-snug font-display drop-shadow-md"
+                  style={{ color: colors.text }}
+                >
+                  {title}
+                </h2>
+              </div>
+
+              {/* Optional Highlight Callout */}
+              {highlight && (
+                <div 
+                  className="p-2.5 rounded-xl border flex items-center gap-2 text-xs font-semibold backdrop-blur-md shadow-sm"
+                  style={{
+                    borderColor: `${colors.accent}60`,
+                    backgroundColor: `${colors.accent}15`,
+                    color: colors.text
+                  }}
+                >
+                  <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
+                  <span>{highlight}</span>
+                </div>
+              )}
+
               <div 
-                className="p-2.5 rounded-xl border flex items-center gap-2 text-xs font-semibold backdrop-blur-md shadow-sm"
+                className="p-4 rounded-xl border relative backdrop-blur-md shadow-lg"
                 style={{
-                  borderColor: `${colors.accent}60`,
-                  backgroundColor: `${colors.accent}15`,
-                  color: colors.text
+                  backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}90`,
+                  borderColor: `${colors.accent}35`
                 }}
               >
-                <Zap className="w-3.5 h-3.5 shrink-0" style={{ color: colors.accent }} />
-                <span>{highlight}</span>
+                <p 
+                  className="text-xs sm:text-sm leading-relaxed opacity-95 whitespace-pre-line font-sans"
+                  style={{ color: colors.text }}
+                >
+                  {body || 'Añade el contenido clave aquí para complementar este paso del carrusel.'}
+                </p>
               </div>
-            )}
-
-            <div 
-              className="p-4 rounded-xl border relative backdrop-blur-md shadow-lg"
-              style={{
-                backgroundColor: hasCustomBg ? 'rgba(7, 13, 26, 0.75)' : `${colors.primary === '#070d1a' ? '#0d1629' : colors.primary}90`,
-                borderColor: `${colors.accent}35`
-              }}
-            >
-              <p 
-                className="text-xs sm:text-sm leading-relaxed opacity-95 whitespace-pre-line font-sans"
-                style={{ color: colors.text }}
-              >
-                {body || 'Añade el contenido clave aquí para complementar este paso del carrusel.'}
-              </p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Footer spacing buffer */}

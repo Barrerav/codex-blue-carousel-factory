@@ -47,7 +47,10 @@ export function useCarousel() {
             visualConcept: newSlide.visualConcept || existing.visualConcept || '',
             visualPrompt: newSlide.visualPrompt || existing.visualPrompt || '',
             textPosition: newSlide.textPosition || existing.textPosition || 'center',
+            textWidth: newSlide.textWidth || existing.textWidth || 'wide',
+            visualFocus: newSlide.visualFocus || existing.visualFocus || 'center',
             logoPosition: newSlide.logoPosition || existing.logoPosition || 'global',
+            tag: newSlide.tag !== undefined ? newSlide.tag : (existing.tag || ''),
           };
         }
         return newSlide;

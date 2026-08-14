@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ImagePlus, Trash2, Sliders, Image as ImageIcon, Sparkles, Copy, Check, Eye } from 'lucide-react';
+import { ImagePlus, Trash2, Sliders, Image as ImageIcon, Sparkles, Copy, Check, Eye, Maximize, Focus } from 'lucide-react';
 
 export function SlideImageManager({
   slides,
@@ -82,6 +82,8 @@ export function SlideImageManager({
           const overlayVal = Math.round((slide.overlayOpacity !== undefined ? slide.overlayOpacity : 0.65) * 100);
           const bgState = getBackgroundState(slide);
           const isCopied = copiedPromptId === slide.id;
+          const textW = (slide.textWidth || 'wide').toUpperCase();
+          const focusD = (slide.visualFocus || 'center').toUpperCase();
 
           return (
             <div
@@ -107,6 +109,21 @@ export function SlideImageManager({
                 <span className={`text-[9px] font-mono font-bold uppercase px-2 py-0.5 rounded border shrink-0 ${bgState.colorClass}`}>
                   {bgState.label}
                 </span>
+              </div>
+
+              {/* Composition Metadata Badges: TEXT_WIDTH & VISUAL_FOCUS */}
+              <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                <span className="px-2 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-slate-400">
+                  TEXT: <strong className="text-blue-300">{textW}</strong>
+                </span>
+                <span className="px-2 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-slate-400">
+                  FOCUS: <strong className="text-purple-300">{focusD}</strong>
+                </span>
+                {slide.textPosition && slide.textPosition !== 'center' && (
+                  <span className="px-2 py-0.5 rounded bg-slate-950/80 border border-slate-800 text-slate-400">
+                    POS: <strong className="text-slate-300">{slide.textPosition.toUpperCase()}</strong>
+                  </span>
+                )}
               </div>
 
               {/* Visual Concept description (if available) */}

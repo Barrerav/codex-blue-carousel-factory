@@ -7,7 +7,7 @@ import { Edit3 } from 'lucide-react';
 /**
  * SlideCard component with strict 4:5 aspect ratio, template rendering,
  * custom background image, contrast overlay, real logo branding, text positioning,
- * highlight callouts, watermark, slide counter, and hover controls.
+ * text width constraint, visual focus, watermark, slide counter, and hover controls.
  */
 export const SlideCard = forwardRef(function SlideCard(
   {
@@ -49,6 +49,8 @@ export const SlideCard = forwardRef(function SlideCard(
       isExport,
       hasCustomBg,
       textPosition: slide.textPosition || 'center',
+      textWidth: slide.textWidth || 'wide',
+      visualFocus: slide.visualFocus || 'center',
       highlight: slide.highlight || '',
       logoPosition: effectiveLogoPosition,
       hasLogoTop: Boolean(showLogo && (logoImage || showWatermark) && effectiveLogoPosition.startsWith('top')),
@@ -178,7 +180,7 @@ export const SlideCard = forwardRef(function SlideCard(
               onEdit(slide);
             }}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-sm cursor-pointer"
-            title="Editar texto, prompt y fondo de este slide"
+            title="Editar texto, composición, prompt y fondo de este slide"
           >
             <Edit3 className="w-3.5 h-3.5" />
             <span>Editar</span>

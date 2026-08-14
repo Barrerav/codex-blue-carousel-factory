@@ -1,6 +1,8 @@
 /**
  * @typedef {'hook' | 'content' | 'cta'} SlideType
  * @typedef {'top' | 'upper-center' | 'center' | 'lower-center' | 'bottom'} TextPosition
+ * @typedef {'narrow' | 'medium' | 'wide'} TextWidth
+ * @typedef {'left' | 'center' | 'right' | 'full'} VisualFocus
  * @typedef {'global' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'} SlideLogoPosition
  * @typedef {'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'} GlobalLogoPosition
  * 
@@ -15,6 +17,8 @@
  * @property {string} [visualConcept] - Short description of visual background concept
  * @property {string} [visualPrompt] - Full prompt for Gemini image generation
  * @property {TextPosition} [textPosition] - Vertical alignment for main content
+ * @property {TextWidth} [textWidth] - Horizontal width limit for text block ('narrow' | 'medium' | 'wide')
+ * @property {VisualFocus} [visualFocus] - Focal direction for generated image ('left' | 'center' | 'right' | 'full')
  * @property {SlideLogoPosition} [logoPosition] - Position of logo on this slide
  * @property {string} [rawHeader]
  * @property {string} [tag]
