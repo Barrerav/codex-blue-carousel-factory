@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 import confetti from 'canvas-confetti';
 
 /**
- * Renders an array of slide DOM elements to 1080x1350 PNGs and packages them into a ZIP file.
+ * Renders an array of slide DOM elements to strict 1080x1350 PNGs and packages them into a ZIP file.
  * 
  * @param {HTMLElement[]} slideElements
  * @param {Object} options
@@ -20,6 +20,11 @@ export async function exportSlidesToZip(slideElements, options = {}) {
     throw new Error('No hay elementos de slide disponibles para exportar.');
   }
 
+  // Ensure all web fonts (Plus Jakarta Sans, Inter, Playfair Display) are fully loaded
+  if (document.fonts) {
+    await document.fonts.ready;
+  }
+
   const zip = new JSZip();
   const total = validElements.length;
 
@@ -29,22 +34,28 @@ export async function exportSlidesToZip(slideElements, options = {}) {
       onProgress(i + 1, total);
     }
 
-    // High resolution render (1080 x 1350)
-    // html-to-image captures element CSS and renders to canvas
+    // Exact 1080x1350px Instagram standard resolution:
+    // Base 540x675 layout scaled at 2x pixelRatio -> 1080x1350px
     const dataUrl = await toPng(el, {
-      pixelRatio: 3, // 3x scaling ensures 1080x1350 sharpness
+      width: 540,
+      height: 675,
+      pixelRatio: 2,
       quality: 1,
       cacheBust: true,
       skipFonts: false,
+      filter: (domNode) => {
+        if (domNode?.classList?.contains('export-ignore')) return false;
+        return true;
+      }
     });
 
-    // Extract base64 data from dataURL
+    // Extract base64 payload from dataURL
     const base64Data = dataUrl.replace(/^data:image\/png;base64,/, '');
     const slideNumber = String(i + 1).padStart(2, '0');
     zip.file(`slide-${slideNumber}.png`, base64Data, { base64: true });
   }
 
-  // Generate and save ZIP file
+  // Generate and trigger download of ZIP package
   const zipBlob = await zip.generateAsync({ type: 'blob' });
   saveAs(zipBlob, zipFileName);
 
@@ -57,22 +68,32 @@ export async function exportSlidesToZip(slideElements, options = {}) {
       colors: ['#3b82f6', '#60a5fa', '#93c5fd', '#ffffff']
     });
   } catch (e) {
-    // Ignore confetti errors if canvas unavailable
+    // Ignore canvas confetti errors in unsupported environments
   }
 
   return true;
 }
 
 /**
- * Exports a single slide node to PNG.
+ * Exports a single slide node directly to 1080x1350 PNG.
  */
 export async function exportSingleSlide(slideElement, slideIndex) {
   if (!slideElement) return;
 
+  if (document.fonts) {
+    await document.fonts.ready;
+  }
+
   const dataUrl = await toPng(slideElement, {
-    pixelRatio: 3,
+    width: 540,
+    height: 675,
+    pixelRatio: 2,
     quality: 1,
     cacheBust: true,
+    filter: (domNode) => {
+      if (domNode?.classList?.contains('export-ignore')) return false;
+      return true;
+    }
   });
 
   const slideNumber = String(slideIndex).padStart(2, '0');

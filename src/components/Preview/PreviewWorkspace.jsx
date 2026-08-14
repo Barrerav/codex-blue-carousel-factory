@@ -74,25 +74,31 @@ export function PreviewWorkspace({
         )}
       </div>
 
-      {/* Offscreen 1080x1350 Export Staging Container */}
-      {/* This invisible container renders each slide at exact 1080x1350px size for html-to-image export */}
+      {/* Offscreen 540x675 Export Staging Container */}
+      {/* Renders each slide in standard 4:5 proportions with 2x multiplier for guaranteed 1080x1350 output */}
       <div 
         ref={exportContainerRef}
         aria-hidden="true"
-        className="fixed top-0 left-[-9999px] pointer-events-none opacity-0"
-        style={{ width: '1080px' }}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: '-9999px',
+          width: '540px',
+          pointerEvents: 'none',
+          zIndex: -9999,
+        }}
       >
         {slides.map((slide, idx) => (
           <div
             key={`export-${slide.id || idx}`}
             id={`export-slide-${idx}`}
-            style={{ width: '1080px', height: '1350px', position: 'relative' }}
+            style={{ width: '540px', height: '675px', position: 'relative' }}
           >
             <SlideCard
               slide={slide}
               config={config}
               isExport={true}
-              className="w-[1080px] h-[1350px] !rounded-none !border-none text-base"
+              className="w-[540px] h-[675px]"
             />
           </div>
         ))}
